@@ -1,0 +1,208 @@
+[
+  {
+    "id": "root",
+    "type": "question",
+    "text": "Welcome! I'm your Election Guide. What would you like help with today?",
+    "options": [
+      { "label": "Register as a new voter (Form 6)", "nextId": "form6_eligibility" },
+      { "label": "Update / correct my voter details (Form 8)", "nextId": "form8_what" },
+      { "label": "Delete my voter entry (Form 7)", "nextId": "form7_reason" },
+      { "label": "Transfer vote to new address (Form 8A)", "nextId": "form8a_check" },
+      { "label": "I lost my Voter ID card", "nextId": "lostid_fir" },
+      { "label": "Vote from outside my city", "nextId": "outofcity_info" },
+      { "label": "What is NOTA?", "nextId": "nota_what" }
+    ]
+  },
+  {
+    "id": "form6_eligibility",
+    "type": "question",
+    "text": "To register as a voter you must be an Indian citizen and at least 18 years old by January 1 of the reference year. Do you meet these requirements?",
+    "options": [
+      { "label": "Yes — I'm 18+ and an Indian citizen", "nextId": "form6_documents" },
+      { "label": "I'm under 18 but turning 18 soon", "nextId": "form6_ineligible" },
+      { "label": "I'm not sure about my eligibility", "nextId": "form6_documents" }
+    ]
+  },
+  {
+    "id": "form6_documents",
+    "type": "info",
+    "text": "Great! For Form 6 you'll need: Age Proof (Aadhaar / Birth Certificate / School Certificate), Address Proof (Aadhaar / Utility Bill / Bank Passbook), and a recent passport-size photograph. How would you like to apply?",
+    "options": [
+      { "label": "Apply online at voters.eci.gov.in", "nextId": "form6_online" },
+      { "label": "Apply offline at my local BLO office", "nextId": "form6_offline" }
+    ]
+  },
+  {
+    "id": "form6_online",
+    "type": "terminal",
+    "text": "You're all set! Apply online: (1) Visit voters.eci.gov.in or the Voter Helpline App. (2) Click 'New Registration' and select Form 6. (3) Upload your documents and submit — save your Application ID. (4) Track status on the same portal. Processing takes 30–45 days and your EPIC card will arrive by post.",
+    "formId": "form6",
+    "ctaLabel": "Go to voters.eci.gov.in",
+    "ctaUrl": "https://voters.eci.gov.in"
+  },
+  {
+    "id": "form6_offline",
+    "type": "terminal",
+    "text": "To apply offline: (1) Visit your local Electoral Registration Officer (ERO) or Booth Level Officer (BLO). (2) Collect Form 6 (free of cost). (3) Fill and attach self-attested documents. (4) Submit and keep the acknowledgment receipt. A BLO will visit for doorstep verification. Call 1950 to find your BLO.",
+    "formId": "form6"
+  },
+  {
+    "id": "form6_ineligible",
+    "type": "terminal",
+    "text": "Not quite yet! You become eligible on your 18th birthday if it falls on or before January 1 of the reference year. Good news: you can pre-register at 17 — your name is added automatically after your birthday. Come back and register as soon as you're eligible — every vote counts!"
+  },
+  {
+    "id": "form7_reason",
+    "type": "question",
+    "text": "Form 7 requests deletion of a voter entry. What is the reason for deletion?",
+    "options": [
+      { "label": "The voter has passed away", "nextId": "form7_death_terminal" },
+      { "label": "The voter has permanently shifted away", "nextId": "form7_shifted_terminal" },
+      { "label": "It's a bogus or duplicate entry", "nextId": "form7_bogus_terminal" }
+    ]
+  },
+  {
+    "id": "form7_death_terminal",
+    "type": "terminal",
+    "text": "To delete a deceased voter's entry: (1) Download Form 7 from voters.eci.gov.in. (2) Attach a death certificate (municipal or hospital). (3) Submit to your local ERO or online. Any family member or citizen can file this. This keeps electoral rolls accurate.",
+    "formId": "form7"
+  },
+  {
+    "id": "form7_shifted_terminal",
+    "type": "terminal",
+    "text": "For permanent relocation you have two paths. Option A — Same district: File Form 8A for transposition (faster!). Option B — New district or state: Delete old entry with Form 7, then register at the new address with Form 6. Documents needed: proof of new address.",
+    "formId": "form7"
+  },
+  {
+    "id": "form7_bogus_terminal",
+    "type": "terminal",
+    "text": "To remove a bogus or duplicate entry: (1) Download Form 7 from voters.eci.gov.in. (2) State the reason clearly — 'Duplicate entry' or 'Non-existent person'. (3) Provide any supporting evidence. (4) Submit to ERO — an investigation will follow. Warning: filing a false complaint is an offence under the Representation of the People Act.",
+    "formId": "form7"
+  },
+  {
+    "id": "form8_what",
+    "type": "question",
+    "text": "Form 8 lets you correct or update your existing voter entry. What needs to be changed?",
+    "options": [
+      { "label": "My name has a spelling error", "nextId": "form8_name_terminal" },
+      { "label": "My photo is outdated or unclear", "nextId": "form8_photo_terminal" },
+      { "label": "I've moved within the same constituency", "nextId": "form8_address_terminal" },
+      { "label": "My date of birth is wrong", "nextId": "form8_dob_terminal" },
+      { "label": "My gender is incorrectly listed", "nextId": "form8_gender_terminal" }
+    ]
+  },
+  {
+    "id": "form8_name_terminal",
+    "type": "terminal",
+    "text": "To correct your name: Documents needed — Aadhaar with correct name, or PAN card / Passport, or a self-declaration for minor changes. Fill Form 8, choose 'Name Correction', and submit at voters.eci.gov.in or your local ERO. Processing takes 15–30 days.",
+    "formId": "form8"
+  },
+  {
+    "id": "form8_photo_terminal",
+    "type": "terminal",
+    "text": "To update your photo: (1) Take a new recent passport-size photograph. (2) Fill Form 8 at voters.eci.gov.in. (3) Upload the new photo in the designated field. (4) Submit — verification may include a home visit. A clear recent photo helps polling officers identify you faster on election day.",
+    "formId": "form8"
+  },
+  {
+    "id": "form8_address_terminal",
+    "type": "terminal",
+    "text": "Changed address within your constituency? Documents needed: new address proof (Aadhaar / utility bill / bank statement). Option 1 — File Form 8 for address change within constituency. Option 2 — If you've moved to a different part of the same constituency, Form 8A (transposition) is faster. Apply at voters.eci.gov.in.",
+    "formId": "form8"
+  },
+  {
+    "id": "form8_dob_terminal",
+    "type": "terminal",
+    "text": "To correct your date of birth: Documents needed — Birth certificate (municipal or hospital), or School leaving certificate, or Aadhaar showing the correct DOB. Fill Form 8, choose 'Date of Birth Correction', upload proof, and submit. Verification typically takes 15–30 days.",
+    "formId": "form8"
+  },
+  {
+    "id": "form8_gender_terminal",
+    "type": "terminal",
+    "text": "To correct your gender entry: The ECI accepts self-declaration for transgender and third gender registrations. Documents: Gazette notification or court order for legal name or gender change — or just a self-declaration for third gender. Fill Form 8, choose 'Gender Correction', and submit at voters.eci.gov.in. Your identity, your vote.",
+    "formId": "form8"
+  },
+  {
+    "id": "form8a_check",
+    "type": "question",
+    "text": "Form 8A is for transposition — moving your voter entry within the same Assembly constituency. Have you moved to a new house within the same constituency?",
+    "options": [
+      { "label": "Yes — within the same constituency", "nextId": "form8a_eligible_terminal" },
+      { "label": "No — moved to a different constituency or district", "nextId": "form8a_ineligible_terminal" }
+    ]
+  },
+  {
+    "id": "form8a_eligible_terminal",
+    "type": "terminal",
+    "text": "Form 8A (Transposition) is perfect for you! Documents needed: new address proof within the same constituency. (1) Fill Form 8A at voters.eci.gov.in. (2) Your entry moves to the correct polling station. (3) No need to re-register from scratch! Processing takes 10–20 days — the fastest voter address update option.",
+    "formId": "form8a"
+  },
+  {
+    "id": "form8a_ineligible_terminal",
+    "type": "terminal",
+    "text": "Form 8A won't work for cross-constituency moves. Here's what to do: (1) Delete your old entry — File Form 7 with the old address Electoral Roll. (2) Register at the new address — File Form 6 with new address proof. Pro tip: You can do both online at voters.eci.gov.in at the same time.",
+    "formId": "form6"
+  },
+  {
+    "id": "lostid_fir",
+    "type": "question",
+    "text": "Sorry to hear you lost your Voter ID (EPIC card)! Good news — you don't need a police FIR to get a replacement. But filing one is advisable if the card was stolen. What would you like to do?",
+    "options": [
+      { "label": "File FIR first, then replace (stolen card)", "nextId": "lostid_fir_yes_terminal" },
+      { "label": "Just replace directly (lost or misplaced)", "nextId": "lostid_no_fir_terminal" }
+    ]
+  },
+  {
+    "id": "lostid_fir_yes_terminal",
+    "type": "terminal",
+    "text": "Good decision. Process: (1) File FIR at local police station and get a copy. (2) Visit voters.eci.gov.in and choose 'Duplicate EPIC card'. (3) Upload: FIR copy + recent photo + address proof. (4) Pay the Rs 25 fee. (5) Card dispatched in 30–45 days. Voter Helpline: 1950."
+  },
+  {
+    "id": "lostid_no_fir_terminal",
+    "type": "terminal",
+    "text": "No FIR needed for a misplaced card! Steps: (1) Visit voters.eci.gov.in and choose 'Duplicate EPIC'. (2) Enter your EPIC number or search by name. (3) Upload a recent photo + address proof. (4) Pay the Rs 25 replacement fee. (5) Card arrives in 30–45 days. Tip: use the Voter Helpline App's e-EPIC (digital voter card) — legally valid at booths!"
+  },
+  {
+    "id": "outofcity_info",
+    "type": "question",
+    "text": "Voting from outside your home constituency? The rules depend on your situation. Which applies to you?",
+    "options": [
+      { "label": "I'm a student or working professional", "nextId": "outofcity_absentee_terminal" },
+      { "label": "I'm in the Armed Forces or paramilitary", "nextId": "outofcity_postal_terminal" },
+      { "label": "I'll travel back to my constituency to vote", "nextId": "outofcity_travel_terminal" }
+    ]
+  },
+  {
+    "id": "outofcity_absentee_terminal",
+    "type": "terminal",
+    "text": "For students and working professionals: India currently doesn't have a general proxy or postal voting system for this category. Your options: (1) Travel home on election day — book trains and buses early! (2) Transfer your voter registration to your current city by filing Form 8 or Form 6. Check if your state allows Electronically Transmitted Postal Ballot (ETPBS). Helpline: 1950."
+  },
+  {
+    "id": "outofcity_postal_terminal",
+    "type": "terminal",
+    "text": "Armed Forces and paramilitary personnel have special voting rights! You're eligible for: Postal Ballot — vote by mail from your posting location, or Proxy Voting — appoint a trusted proxy to vote on your behalf. Contact your unit's Record Office or Commanding Officer for Form 12 or 12A. Also register on ELIS as a Service Voter if you haven't already."
+  },
+  {
+    "id": "outofcity_travel_terminal",
+    "type": "terminal",
+    "text": "Traveling back to vote — that's civic commitment! Tips: (1) Find your polling booth via SMS 'ECIVIC' to 1950 or voters.eci.gov.in. (2) Carry your EPIC card or any approved ID (Aadhaar, PAN, Passport). (3) Check voting hours — usually 7 AM to 6 PM. (4) Booths have ramps and wheelchair access as required by ECI. Your vote is your voice!"
+  },
+  {
+    "id": "nota_what",
+    "type": "info",
+    "text": "NOTA stands for None Of The Above. It's a voting option that lets you reject all candidates on the ballot, introduced by the Supreme Court in 2013. NOTA appears as the last option on the EVM, it is a valid counted vote, and even if NOTA gets the most votes the candidate with the highest votes among actual candidates still wins. It's your right to say 'none of these' — and it sends a message to political parties!",
+    "options": [
+      { "label": "How do I vote NOTA?", "nextId": "nota_how_terminal" },
+      { "label": "Does NOTA actually change anything?", "nextId": "nota_effect_terminal" }
+    ]
+  },
+  {
+    "id": "nota_how_terminal",
+    "type": "terminal",
+    "text": "How to vote NOTA on an EVM: (1) Enter the polling booth with your voter ID. (2) The presiding officer verifies you and marks your finger with indelible ink. (3) At the EVM, find the last button labeled NOTA. (4) Press the button — you'll hear a beep and see a green light. Your vote is cast. Simple, anonymous, and final. Practice in the simulation below!"
+  },
+  {
+    "id": "nota_effect_terminal",
+    "type": "terminal",
+    "text": "NOTA's legal effect: NOTA votes are counted and publicly reported. NOTA cannot win — even if it gets the most votes, the candidate with the highest real votes wins. Exception: Some High Courts (like Gujarat HC, 2017) ruled that if NOTA wins a local body election a re-election must be held — but this doesn't apply to national elections. A high NOTA percentage still sends a strong public signal to parties."
+  }
+]

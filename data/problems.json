@@ -1,0 +1,50 @@
+[
+  {
+    "id": "name_mismatch",
+    "problem": "Name on voter card doesn't match Aadhaar",
+    "solution": "File Form 8 for name correction. Upload your Aadhaar as proof of the correct name. Processing takes 15–30 days.",
+    "urgency": "medium",
+    "formId": "form8",
+    "emoji": "✏️"
+  },
+  {
+    "id": "not_in_list",
+    "problem": "My name is missing from the electoral roll",
+    "solution": "Search at voters.eci.gov.in to confirm. If genuinely missing, file Form 6 immediately. On election day, approach the ERO for a Tender Vote.",
+    "urgency": "high",
+    "formId": "form6",
+    "emoji": "🔍"
+  },
+  {
+    "id": "wrong_photo",
+    "problem": "My voter ID has a very old or blurry photo",
+    "solution": "File Form 8 for photo correction. Bring a new recent passport-size photograph. The updated card is issued after verification.",
+    "urgency": "low",
+    "formId": "form8",
+    "emoji": "📸"
+  },
+  {
+    "id": "double_entry",
+    "problem": "I'm registered in two different constituencies",
+    "solution": "File Form 7 to delete one entry. By law, you can only be registered in one constituency — your current residential address.",
+    "urgency": "high",
+    "formId": "form7",
+    "emoji": "⚠️"
+  },
+  {
+    "id": "wrong_address",
+    "problem": "Voter ID shows my old address after moving",
+    "solution": "If within the same constituency, use Form 8A (transposition — fastest option). If you've moved to a new constituency, file Form 7 + Form 6.",
+    "urgency": "medium",
+    "formId": "form8a",
+    "emoji": "🏠"
+  },
+  {
+    "id": "damaged_epic",
+    "problem": "My Voter ID card is damaged or torn",
+    "solution": "Apply for a duplicate EPIC at voters.eci.gov.in. Pay the Rs 25 fee. While waiting, the e-EPIC digital card on the Voter Helpline App is legally valid at booths.",
+    "urgency": "low",
+    "formId": "form6",
+    "emoji": "💳"
+  }
+]

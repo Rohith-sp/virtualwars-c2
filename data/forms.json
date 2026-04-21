@@ -1,0 +1,93 @@
+[
+  {
+    "id": "form6",
+    "number": "Form 6",
+    "title": "New Voter Registration",
+    "emoji": "🆕",
+    "accentColor": "#22C55E",
+    "eligibility": "Indian citizen, 18+ years old by January 1 of the reference year",
+    "documents": [
+      "Age Proof — Aadhaar, Birth Certificate, or School Certificate",
+      "Address Proof — Aadhaar, Utility Bill, or Bank Passbook",
+      "Recent passport-size photograph"
+    ],
+    "processingDays": "30–45 days",
+    "onlineUrl": "https://voters.eci.gov.in",
+    "steps": [
+      "Visit voters.eci.gov.in and click 'New Registration'",
+      "Select Form 6 and fill in your personal details carefully",
+      "Upload your age proof, address proof, and photo",
+      "Submit and save your Application Reference Number",
+      "A Booth Level Officer may visit for doorstep verification",
+      "Your EPIC card will be dispatched by post after approval"
+    ]
+  },
+  {
+    "id": "form7",
+    "number": "Form 7",
+    "title": "Deletion of Voter Entry",
+    "emoji": "🗑️",
+    "accentColor": "#EF4444",
+    "eligibility": "Any citizen can file on behalf of a deceased or relocated voter",
+    "documents": [
+      "Death certificate for deceased voter (municipal or hospital)",
+      "Proof of permanent relocation (utility bill, Aadhaar at new address)",
+      "Supporting evidence for bogus or duplicate entries"
+    ],
+    "processingDays": "15–30 days",
+    "onlineUrl": "https://voters.eci.gov.in",
+    "steps": [
+      "Download Form 7 from voters.eci.gov.in",
+      "Fill in the voter's full details and reason for deletion",
+      "Attach the required supporting documents",
+      "Submit to your local Electoral Registration Officer (ERO) or online",
+      "The ERO will investigate and verify the claim",
+      "Confirmation sent after the entry is removed from rolls"
+    ]
+  },
+  {
+    "id": "form8",
+    "number": "Form 8",
+    "title": "Correction in Voter Details",
+    "emoji": "✏️",
+    "accentColor": "#FF6B35",
+    "eligibility": "Any registered voter who needs to update their electoral entry",
+    "documents": [
+      "Proof of correct detail — Aadhaar, PAN card, or Birth Certificate",
+      "Recent photograph (for photo correction)",
+      "New address proof (for address correction)"
+    ],
+    "processingDays": "15–30 days",
+    "onlineUrl": "https://voters.eci.gov.in",
+    "steps": [
+      "Visit voters.eci.gov.in and log in with your registered mobile",
+      "Select Form 8 and choose the field that needs correction",
+      "Upload documentary proof of the correct information",
+      "Submit and note your Application Reference Number",
+      "Verification may include a Booth Level Officer home visit",
+      "Updated EPIC card issued within the processing timeframe"
+    ]
+  },
+  {
+    "id": "form8a",
+    "number": "Form 8A",
+    "title": "Transposition Within Constituency",
+    "emoji": "🔄",
+    "accentColor": "#0EA5E9",
+    "eligibility": "Voters who have moved to a new address within the same Assembly constituency",
+    "documents": [
+      "New address proof within same constituency — Aadhaar or Utility Bill",
+      "Your current EPIC card number"
+    ],
+    "processingDays": "10–20 days",
+    "onlineUrl": "https://voters.eci.gov.in",
+    "steps": [
+      "Confirm your new address is in the same Assembly constituency",
+      "Visit voters.eci.gov.in and select Form 8A",
+      "Enter your EPIC number and new address details",
+      "Upload your new address proof",
+      "Submit — your entry moves to the correct polling station",
+      "No new EPIC card issued; same card number at new polling location"
+    ]
+  }
+]

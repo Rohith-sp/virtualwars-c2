@@ -1,0 +1,58 @@
+[
+  {
+    "id": "announcement",
+    "phase": "Announcement",
+    "description": "Election Commission announces election dates. Model Code of Conduct kicks in immediately — government cannot announce new schemes or transfers.",
+    "icon": "📢",
+    "daysBeforeElection": 45,
+    "accentColor": "#FF6B35"
+  },
+  {
+    "id": "nominations",
+    "phase": "Nominations",
+    "description": "Candidates file their nomination papers. The Returning Officer scrutinises each nomination for eligibility and completeness.",
+    "icon": "📝",
+    "daysBeforeElection": 35,
+    "accentColor": "#FBBF24"
+  },
+  {
+    "id": "withdrawal",
+    "phase": "Withdrawal",
+    "description": "Last date for candidates to withdraw from the race. The final candidate list is published and symbols are allotted.",
+    "icon": "📋",
+    "daysBeforeElection": 28,
+    "accentColor": "#0EA5E9"
+  },
+  {
+    "id": "campaign",
+    "phase": "Campaign Period",
+    "description": "Parties campaign actively through rallies, advertising, and canvassing. Model Code of Conduct is strictly enforced throughout.",
+    "icon": "📣",
+    "daysBeforeElection": 14,
+    "accentColor": "#8B5CF6"
+  },
+  {
+    "id": "silence",
+    "phase": "Campaign Silence",
+    "description": "48 hours before polling, all campaigning stops. No rallies, no political ads, no social media campaigns during this period.",
+    "icon": "🤫",
+    "daysBeforeElection": 2,
+    "accentColor": "#6B7280"
+  },
+  {
+    "id": "polling",
+    "phase": "Polling Day",
+    "description": "Voters cast their ballots. Booths open 7 AM to 6 PM. Indelible ink marks your finger. Carry at least one approved photo ID.",
+    "icon": "🗳️",
+    "daysBeforeElection": 0,
+    "accentColor": "#22C55E"
+  },
+  {
+    "id": "counting",
+    "phase": "Vote Counting",
+    "description": "Ballots are counted at designated counting centres under observer supervision. Results are declared and winners take oath of office.",
+    "icon": "🏆",
+    "daysBeforeElection": -2,
+    "accentColor": "#FF6B35"
+  }
+]
