@@ -230,6 +230,10 @@ a:hover { color: var(--color-primary-light); }
   padding: var(--space-16) var(--space-6);
   max-width: 1200px;
   margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .section-title {

@@ -5,7 +5,14 @@ export default function TimelineBanner() {
   return (
     <section
       aria-label="Election Timeline"
-      style={{ padding: 'var(--space-12) var(--space-6)', overflowX: 'auto' }}
+      style={{
+        padding: 'var(--space-12) var(--space-6)',
+        overflowX: 'auto',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+      }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <p className="section-subtitle">How Elections Work</p>

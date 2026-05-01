@@ -82,6 +82,7 @@ export default function Home() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: 'var(--space-12)',
             alignItems: 'center',
+            minHeight: 'calc(100vh - 64px)',
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
