@@ -149,15 +149,16 @@ export default function Home() {
           id="guide"
           aria-labelledby="guide-heading"
           className="section"
+          style={{ textAlign: 'center' }}
         >
           <p className="section-subtitle">Step-by-Step Chatbot</p>
           <h2 id="guide-heading" className="section-title">
             Your Personalised Voter Guide
           </h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-8)', maxWidth: '560px' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-8)', maxWidth: '560px', margin: '0 auto var(--space-8)' }}>
             Answer a few questions and get tailored instructions — no searching through PDFs required.
           </p>
-          <div style={{ maxWidth: '680px' }}>
+          <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'left' }}>
             <ErrorBoundary>
               <FlowChat />
             </ErrorBoundary>
@@ -237,15 +238,16 @@ export default function Home() {
           id="ai-chat"
           aria-labelledby="chat-heading"
           className="section"
+          style={{ textAlign: 'center' }}
         >
           <p className="section-subtitle">AI Assistant</p>
           <h2 id="chat-heading" className="section-title">
             Ask Anything About Voting
           </h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-8)', maxWidth: '560px' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-8)', maxWidth: '560px', margin: '0 auto var(--space-8)' }}>
             Free-text questions answered by Gemini AI — trained to cover only Indian election topics.
           </p>
-          <div style={{ maxWidth: '680px' }}>
+          <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'left' }}>
             <ChatWindow />
           </div>
         </section>
