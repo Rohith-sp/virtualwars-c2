@@ -3,65 +3,104 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { trackEvent, GA_EVENTS } from '@/lib/analytics';
 
+const MAX_CHARS = 500;
+const MAX_HISTORY_TURNS = 6; // last 6 turns (3 user + 3 assistant) sent for context
 
 function sanitize(str) {
-  return String(str).trim().slice(0, 500);
+  return String(str).trim().slice(0, MAX_CHARS);
+}
+
+// Auto-resize a textarea to fit its content
+function autoResize(el) {
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
 }
 
 export default function ChatWindow({ onClose }) {
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: 'Hi! Ask me anything about voting in India — registration, lost ID, NOTA, or election day rules.' },
+    {
+      role: 'assistant',
+      text: 'Hi! Ask me anything about voting in India — registration, lost ID, NOTA, or election day rules.',
+    },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const logRef = useRef(null);
+  const textareaRef = useRef(null);
+  const sessionId = useRef(`session-${Date.now()}`);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     if (logRef.current) {
       logRef.current.scrollTop = logRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, loading]);
 
-  // useMemo: derive display list from messages (e.g. add metadata, keys)
+  // Auto-grow textarea on input change
+  useEffect(() => {
+    autoResize(textareaRef.current);
+  }, [input]);
+
   const displayMessages = useMemo(
     () => messages.map((m, i) => ({ ...m, key: `${m.role}-${i}` })),
     [messages],
   );
 
+  // Build a trimmed history slice to send with each request for context
+  const buildHistory = useCallback(
+    (currentMessages) =>
+      currentMessages
+        .slice(-MAX_HISTORY_TURNS * 2)
+        .map(({ role, text }) => ({ role, content: text })),
+    [],
+  );
+
+  const handleClose = useCallback(() => {
+    setError('');
+    onClose();
+  }, [onClose]);
+
   const handleSubmit = useCallback(
     async (e) => {
-      e.preventDefault();
+      e?.preventDefault();
       const question = sanitize(input);
       if (!question || loading) return;
 
       setInput('');
       setError('');
-      setMessages((prev) => [...prev, { role: 'user', text: question }]);
+
+      const nextMessages = [...messages, { role: 'user', text: question }];
+      setMessages(nextMessages);
       setLoading(true);
-      trackEvent(GA_EVENTS.AI_QUESTION_ASKED, { question_length: question.length });
+
+      trackEvent(GA_EVENTS.AI_QUESTION_ASKED, {
+        question_length: question.length,
+        session_id: sessionId.current,
+        turn_count: nextMessages.length,
+      });
 
       try {
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question }),
+          body: JSON.stringify({
+            question,
+            history: buildHistory(nextMessages),
+            session_id: sessionId.current,
+          }),
         });
 
         if (res.status === 429) {
           setError('Rate limit reached. Please wait a minute before asking again.');
-          setLoading(false);
           return;
         }
         if (res.status === 504) {
           setError('The AI is taking too long right now. Please try again in a moment.');
-          setLoading(false);
           return;
         }
         if (!res.ok) {
           setError('Something went wrong. Please try again.');
-          setLoading(false);
           return;
         }
 
@@ -73,7 +112,7 @@ export default function ChatWindow({ onClose }) {
         setLoading(false);
       }
     },
-    [input, loading],
+    [input, loading, messages, buildHistory],
   );
 
   const handleKeyDown = useCallback(
@@ -86,165 +125,242 @@ export default function ChatWindow({ onClose }) {
     [handleSubmit],
   );
 
-  return (
-    <div
-      style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'var(--bg-base)', borderLeft: '1px solid var(--border-subtle)' }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: 'var(--space-4) var(--space-5)',
-          borderBottom: '1px solid var(--border-subtle)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-3)',
-        }}
-      >
-        <div
-          style={{
-            width: '10px',
-            height: '10px',
-            borderRadius: '50%',
-            background: 'var(--color-success)',
-            boxShadow: '0 0 8px var(--color-success)',
-          }}
-          aria-hidden="true"
-        />
-        <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9375rem' }}>
-          AI Election Assistant
-        </span>
-        <button
-          onClick={onClose}
-          style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}
-          aria-label="Close AI Chat"
-        >
-          ×
-        </button>
-      </div>
+  const handleInputChange = useCallback((e) => {
+    setInput(e.target.value);
+  }, []);
 
-      {/* Message log — role="log" aria-live="polite" per judging criteria */}
+  const charsLeft = MAX_CHARS - input.length;
+  const isNearLimit = charsLeft < 60;
+
+  return (
+    <>
+      <style>{`
+        @keyframes dot-bounce {
+          0%, 100% { transform: translateY(0); opacity: 0.4; }
+          50% { transform: translateY(-4px); opacity: 1; }
+        }
+        .chat-dot { animation: dot-bounce 1s ease-in-out infinite; }
+        .chat-dot:nth-child(2) { animation-delay: 0.15s; }
+        .chat-dot:nth-child(3) { animation-delay: 0.3s; }
+        .chat-send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .chat-send-btn:not(:disabled):hover { opacity: 0.85; }
+        .chat-close-btn:hover { color: var(--text-primary) !important; }
+        .chat-textarea::-webkit-scrollbar { width: 4px; }
+        .chat-textarea::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+      `}</style>
+
       <div
-        ref={logRef}
-        role="log"
-        aria-live="polite"
-        aria-label="Chat messages"
         style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: 'var(--space-4) var(--space-5)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--space-3)',
+          height: '100%',
+          overflow: 'hidden',
+          background: 'var(--bg-base)',
+          borderLeft: '1px solid var(--border-subtle)',
         }}
       >
-        {displayMessages.map((msg) => (
+        {/* ── Header ── */}
+        <div
+          style={{
+            padding: 'var(--space-4) var(--space-5)',
+            borderBottom: '1px solid var(--border-subtle)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-3)',
+            flexShrink: 0,
+          }}
+        >
           <div
-            key={msg.key}
             style={{
-              display: 'flex',
-              justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              background: 'var(--color-success)',
+              flexShrink: 0,
             }}
+            aria-hidden="true"
+          />
+          <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9375rem' }}>
+            AI Election Assistant
+          </span>
+          <button
+            onClick={handleClose}
+            className="chat-close-btn"
+            style={{
+              marginLeft: 'auto',
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-muted)',
+              fontSize: '1.25rem',
+              cursor: 'pointer',
+              lineHeight: 1,
+              padding: '2px 4px',
+              borderRadius: 4,
+              transition: 'color 0.15s',
+            }}
+            aria-label="Close AI chat"
           >
-            <div
-              style={{
-                maxWidth: '80%',
-                padding: 'var(--space-3) var(--space-4)',
-                borderRadius: msg.role === 'user'
-                  ? 'var(--radius-md) var(--radius-md) 4px var(--radius-md)'
-                  : 'var(--radius-md) var(--radius-md) var(--radius-md) 4px',
-                background: msg.role === 'user'
-                  ? 'var(--color-primary)'
-                  : 'var(--bg-surface-2)',
-                color: msg.role === 'user' ? 'var(--color-primary-text)' : 'var(--text-primary)',
-                fontSize: '0.875rem',
-                lineHeight: 1.65,
-              }}
-            >
-              {msg.text}
-            </div>
-          </div>
-        ))}
+            ✕
+          </button>
+        </div>
 
-        {loading && (
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+        {/* ── Message log ── */}
+        <div
+          ref={logRef}
+          role="log"
+          aria-live="polite"
+          aria-label="Chat messages"
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: 'var(--space-4) var(--space-5)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-3)',
+          }}
+        >
+          {displayMessages.map((msg) => (
             <div
-              aria-label="Typing indicator"
+              key={msg.key}
               style={{
                 display: 'flex',
-                gap: '4px',
-                padding: 'var(--space-3) var(--space-4)',
-                background: 'var(--bg-surface-2)',
-                borderRadius: 'var(--radius-md)',
+                justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
               }}
             >
-              {[0, 1, 2].map((i) => (
-                <span
-                  key={i}
-                  aria-hidden="true"
-                  style={{
-                    width: '7px',
-                    height: '7px',
-                    borderRadius: '50%',
-                    background: 'var(--text-muted)',
-                    animation: `spin 0.8s ${i * 0.15}s ease-in-out infinite alternate`,
-                  }}
-                />
-              ))}
+              <div
+                style={{
+                  maxWidth: '82%',
+                  padding: 'var(--space-3) var(--space-4)',
+                  borderRadius:
+                    msg.role === 'user'
+                      ? 'var(--radius-md) var(--radius-md) 4px var(--radius-md)'
+                      : 'var(--radius-md) var(--radius-md) var(--radius-md) 4px',
+                  background:
+                    msg.role === 'user' ? 'var(--color-primary)' : 'var(--bg-surface-2)',
+                  color:
+                    msg.role === 'user' ? 'var(--color-primary-text)' : 'var(--text-primary)',
+                  fontSize: '0.875rem',
+                  lineHeight: 1.65,
+                  wordBreak: 'break-word',
+                }}
+              >
+                {msg.text}
+              </div>
             </div>
-          </div>
-        )}
+          ))}
 
-        {error && (
-          <div
-            role="alert"
-            style={{
-              padding: 'var(--space-3) var(--space-4)',
-              background: 'rgba(239,68,68,0.1)',
-              border: '1px solid rgba(239,68,68,0.3)',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.8125rem',
-              color: 'var(--color-danger)',
-            }}
-          >
-            {error}
-          </div>
-        )}
-      </div>
+          {/* Typing indicator */}
+          {loading && (
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <div
+                aria-label="Assistant is typing"
+                style={{
+                  display: 'flex',
+                  gap: 5,
+                  padding: 'var(--space-3) var(--space-4)',
+                  background: 'var(--bg-surface-2)',
+                  borderRadius: 'var(--radius-md) var(--radius-md) var(--radius-md) 4px',
+                  alignItems: 'center',
+                }}
+              >
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="chat-dot"
+                    aria-hidden="true"
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background: 'var(--text-muted)',
+                      display: 'block',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
-      {/* Input row */}
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          padding: 'var(--space-3) var(--space-4)',
-          borderTop: '1px solid var(--border-subtle)',
-          display: 'flex',
-          gap: 'var(--space-3)',
-          alignItems: 'flex-end',
-        }}
-      >
-        <textarea
-          id="chat-input"
-          className="input"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask about voter registration, lost ID, NOTA…"
-          rows={1}
-          aria-label="Type your election question"
-          style={{ resize: 'none', flex: 1, lineHeight: 1.5 }}
-          maxLength={500}
-          disabled={loading}
-        />
-        <button
-          type="submit"
-          className="btn btn-primary btn-sm"
-          disabled={!input.trim() || loading}
-          aria-label="Send message"
-          style={{ flexShrink: 0 }}
+          {/* Error */}
+          {error && (
+            <div
+              role="alert"
+              style={{
+                padding: 'var(--space-3) var(--space-4)',
+                background: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.25)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.8125rem',
+                color: 'var(--color-danger)',
+                lineHeight: 1.5,
+              }}
+            >
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* ── Input row ── */}
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            padding: 'var(--space-3) var(--space-4)',
+            borderTop: '1px solid var(--border-subtle)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            flexShrink: 0,
+          }}
         >
-          Send
-        </button>
-      </form>
-    </div>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-end' }}>
+            <textarea
+              ref={textareaRef}
+              id="chat-input"
+              className="input chat-textarea"
+              value={input}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask about voter registration, lost ID, NOTA…"
+              rows={1}
+              aria-label="Type your election question"
+              style={{
+                resize: 'none',
+                flex: 1,
+                lineHeight: 1.5,
+                overflowY: 'auto',
+                minHeight: 38,
+                maxHeight: 140,
+              }}
+              maxLength={MAX_CHARS}
+              disabled={loading}
+            />
+            <button
+              type="submit"
+              className="btn btn-primary btn-sm chat-send-btn"
+              disabled={!input.trim() || loading}
+              aria-label="Send message"
+              style={{ flexShrink: 0, alignSelf: 'flex-end' }}
+            >
+              Send
+            </button>
+          </div>
+
+          {/* Character counter — only visible near limit */}
+          {isNearLimit && (
+            <div
+              aria-live="polite"
+              style={{
+                fontSize: '0.75rem',
+                color: charsLeft < 20 ? 'var(--color-danger)' : 'var(--text-muted)',
+                textAlign: 'right',
+                paddingRight: 2,
+              }}
+            >
+              {charsLeft} characters left
+            </div>
+          )}
+        </form>
+      </div>
+    </>
   );
 }

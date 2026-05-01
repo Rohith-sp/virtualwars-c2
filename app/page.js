@@ -299,28 +299,38 @@ export default function Home() {
       {!isChatOpen && (
         <button
           onClick={() => setIsChatOpen(true)}
+          aria-label="Open AI Assistant"
           style={{
             position: 'fixed',
             bottom: 'var(--space-6)',
             right: 'var(--space-6)',
             zIndex: 90,
-            width: '60px',
-            height: '60px',
+            width: 52,
+            height: 52,
             borderRadius: '50%',
             background: 'var(--color-primary)',
             color: '#060c18',
+            border: 'none',
+            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.5rem',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'transform 0.2s',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
           }}
-          aria-label="Open AI Assistant"
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.08)';
+            e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.45)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.35)';
+          }}
         >
-          💬
+          {/* Chat bubble SVG — no emoji, scales cleanly */}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
         </button>
       )}
 
@@ -329,14 +339,17 @@ export default function Home() {
         style={{
           position: 'fixed',
           top: 0,
-          right: isChatOpen ? 0 : '-420px',
-          width: '400px',
-          maxWidth: '100%',
-          height: '100vh',
+          right: 0,
+          width: 400,
+          maxWidth: '100vw',
+          height: '100dvh',
           zIndex: 1000,
-          transition: 'right 0.3s var(--ease)',
-          boxShadow: isChatOpen ? '-4px 0 24px rgba(0,0,0,0.5)' : 'none',
+          transform: isChatOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.3s var(--ease)',
+          boxShadow: isChatOpen ? '-4px 0 32px rgba(0,0,0,0.45)' : 'none',
+          willChange: 'transform',
         }}
+        aria-hidden={!isChatOpen}
       >
         <ChatWindow onClose={() => setIsChatOpen(false)} />
       </div>
