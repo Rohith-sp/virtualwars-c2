@@ -1,6 +1,7 @@
-import { Playfair_Display, DM_Sans } from 'next/font/google';
+import { Playfair_Display, DM_Sans, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
 import SkipLink from '@/components/SkipLink';
+import Toast from '@/components/Toast';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -12,6 +13,12 @@ const playfair = Playfair_Display({
 const dmSans = DM_Sans({
   subsets: ['latin'],
   variable: '--font-dm-sans',
+  display: 'swap',
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
   display: 'swap',
 });
 
@@ -43,8 +50,12 @@ export const metadata = {
     description: 'AI-powered guide to Indian elections. Register, find your booth, and know your rights.',
     images: ['/og-image.png'],
   },
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -52,8 +63,9 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${playfair.variable} ${dmSans.variable}`}>
+      <body className={`${playfair.variable} ${dmSans.variable} ${jetBrainsMono.variable}`}>
         <SkipLink />
+        <Toast />
         {children}
 
         {GA_ID && (

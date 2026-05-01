@@ -9,18 +9,16 @@ const CANDIDATES = [
   { id: 'c2', name: 'Ravi Kumar',    party: 'Development Alliance', symbol: '⚙️' },
   { id: 'c3', name: 'Priya Patel',   party: 'Green Future',         symbol: '🌿' },
   { id: 'c4', name: 'Deepak Sharma', party: 'United Front',         symbol: '✊' },
-  { id: 'c5', name: 'Meera Nair',    party: 'Citizens\u2019 Choice', symbol: '🕊️' },
+  { id: 'c5', name: 'Meera Nair',    party: 'Citizens’ Choice',     symbol: '🕊️' },
   { id: 'nota', name: 'NOTA',        party: 'None Of The Above',    symbol: '❌' },
 ];
 
-// ── Focus trap hook ─────────────────────────────────────────────────────────
 function useFocusTrap(ref, active) {
   useEffect(() => {
     if (!active || !ref.current) return;
     const SELECTORS = 'button:not([disabled]), input:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
     const getFocusable = () => Array.from(ref.current.querySelectorAll(SELECTORS));
 
-    // Focus first focusable element when opened
     getFocusable()[0]?.focus();
 
     const handleKeyDown = (e) => {
@@ -41,15 +39,13 @@ function useFocusTrap(ref, active) {
   }, [active, ref]);
 }
 
-// ── Component ───────────────────────────────────────────────────────────────
 export default function SimulationModal({ isOpen, onClose }) {
-  const [phase, setPhase] = useState('selecting'); // selecting | confirming | voted
+  const [phase, setPhase] = useState('selecting'); // selecting | voted
   const [selected, setSelected] = useState(null);
   const modalRef = useRef(null);
 
   useFocusTrap(modalRef, isOpen);
 
-  // Fire GA event on first open
   useEffect(() => {
     if (isOpen) {
       trackEvent(GA_EVENTS.SIMULATION_STARTED);
@@ -58,7 +54,6 @@ export default function SimulationModal({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose?.(); };
     document.addEventListener('keydown', handler);
@@ -73,20 +68,18 @@ export default function SimulationModal({ isOpen, onClose }) {
     <>
       {phase === 'voted' && <ConfettiOverlay />}
 
-      {/* Backdrop */}
       <div
         aria-hidden="true"
         onClick={onClose}
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0,0,0,0.75)',
-          backdropFilter: 'blur(6px)',
+          background: 'rgba(26,26,46,0.6)',
+          backdropFilter: 'blur(4px)',
           zIndex: 1000,
         }}
       />
 
-      {/* Modal */}
       <div
         ref={modalRef}
         role="dialog"
@@ -102,128 +95,124 @@ export default function SimulationModal({ isOpen, onClose }) {
           maxHeight: '90vh',
           overflowY: 'auto',
           background: 'var(--bg-surface)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-xl)',
-          boxShadow: 'var(--shadow-float)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-lg)',
           padding: 'var(--space-8)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--space-5)',
+          gap: 'var(--space-6)',
         }}
       >
-        {/* Close button */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ fontSize: '1.25rem' }}>🗳️ Practice Voting</h2>
+          <h2 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>EVM Simulation</h2>
           <button
-            className="btn btn-outline btn-sm"
+            className="btn btn-ghost"
             onClick={onClose}
             aria-label="Close simulation modal"
+            style={{ padding: 'var(--space-2)' }}
           >
             ✕
           </button>
         </div>
 
-        {/* Phase: selecting */}
         {phase === 'selecting' && (
           <>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-              This is a safe practice simulation. Select a candidate to vote for:
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+              This is a practice Electronic Voting Machine (EVM) simulation. Select your candidate and press Confirm.
             </p>
-            <div role="group" aria-label="Candidate list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-              {CANDIDATES.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => { setSelected(c.id); setPhase('confirming'); }}
-                  aria-label={`Vote for ${c.name}, ${c.party}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-4)',
-                    padding: 'var(--space-4)',
-                    background: c.id === 'nota' ? 'rgba(239,68,68,0.06)' : 'var(--bg-surface-2)',
-                    border: `1.5px solid ${c.id === 'nota' ? 'rgba(239,68,68,0.2)' : 'var(--border-subtle)'}`,
-                    borderRadius: 'var(--radius-md)',
-                    cursor: 'pointer',
-                    transition: 'border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease)',
-                    textAlign: 'left',
-                    width: '100%',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.transform = 'translateX(4px)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = c.id === 'nota' ? 'rgba(239,68,68,0.2)' : 'var(--border-subtle)'; e.currentTarget.style.transform = ''; }}
-                >
-                  <span style={{ fontSize: '1.75rem', flexShrink: 0 }}>{c.symbol}</span>
-                  <div>
-                    <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9375rem' }}>{c.name}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{c.party}</div>
-                  </div>
-                  <span aria-hidden="true" style={{ marginLeft: 'auto', color: 'var(--text-muted)' }}>›</span>
-                </button>
-              ))}
+            <div role="group" aria-label="Candidate list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              {CANDIDATES.map((c) => {
+                const isSelected = selected === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setSelected(c.id)}
+                    aria-label={`Vote for ${c.name}, ${c.party}`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-4)',
+                      padding: 'var(--space-3) var(--space-4)',
+                      background: isSelected ? 'var(--accent-saffron-light)' : 'var(--bg-subtle)',
+                      border: `2px solid ${isSelected ? 'var(--accent-saffron)' : 'var(--border)'}`,
+                      borderRadius: 'var(--radius-md)',
+                      cursor: 'pointer',
+                      transition: 'all var(--transition-fast)',
+                      textAlign: 'left',
+                      width: '100%',
+                    }}
+                  >
+                    <div style={{ 
+                      width: '44px', height: '44px', borderRadius: 'var(--radius-sm)', 
+                      background: 'var(--bg-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '1.5rem', border: '1px solid var(--border)' 
+                    }}>
+                      {c.symbol}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '1rem', fontFamily: 'var(--font-body)' }}>{c.name}</div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{c.party}</div>
+                    </div>
+                    {/* Fake EVM blue button indicator */}
+                    <div style={{
+                      width: '24px', height: '24px', borderRadius: '50%',
+                      background: isSelected ? 'var(--accent-blue)' : 'var(--border)',
+                      boxShadow: isSelected ? 'inset 0 2px 4px rgba(0,0,0,0.2)' : 'none'
+                    }} />
+                  </button>
+                );
+              })}
             </div>
-          </>
-        )}
-
-        {/* Phase: confirming */}
-        {phase === 'confirming' && candidate && (
-          <>
-            <div
+            
+            <button
+              className="btn btn-primary"
+              disabled={!selected}
+              onClick={() => setPhase('voted')}
               style={{
-                textAlign: 'center',
-                padding: 'var(--space-8)',
-                background: 'var(--bg-surface-2)',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border-subtle)',
+                width: '100%',
+                marginTop: 'var(--space-2)',
+                opacity: selected ? 1 : 0.4,
               }}
             >
-              <div style={{ fontSize: '3rem', marginBottom: 'var(--space-3)' }}>{candidate.symbol}</div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{candidate.name}</div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: 'var(--space-1)' }}>{candidate.party}</div>
-            </div>
-            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
-              Are you sure you want to cast your vote for <strong style={{ color: 'var(--text-primary)' }}>{candidate.name}</strong>?
-            </p>
-            <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-              <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setPhase('selecting')} aria-label="Go back and change your vote">
-                ← Change
-              </button>
-              <button
-                className="btn btn-primary animate-pulse-glow"
-                style={{ flex: 1 }}
-                onClick={() => setPhase('voted')}
-                aria-label={`Confirm vote for ${candidate.name}`}
-              >
-                Confirm Vote ✓
-              </button>
-            </div>
+              Confirm Vote ✓
+            </button>
           </>
         )}
 
-        {/* Phase: voted */}
         {phase === 'voted' && (
-          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-            <div style={{ fontSize: '4rem' }}>🎉</div>
+          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', padding: 'var(--space-6) 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{ 
+                width: '80px', height: '80px', borderRadius: '50%', 
+                background: 'rgba(42,122,75,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--accent-green)', fontSize: '3rem'
+              }}>
+                ✓
+              </div>
+            </div>
             <div>
-              <h3 style={{ color: 'var(--color-success)', fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>
-                Your vote has been cast!
+              <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: '2rem', marginBottom: 'var(--space-2)' }}>
+                Your vote has been recorded
               </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                In a real election your vote is anonymous and final. Thank you for participating in democracy!
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+                In a real election, your vote is anonymous and final. Thank you for participating in democracy!
               </p>
             </div>
             <div
               style={{
                 display: 'inline-block',
                 padding: 'var(--space-4)',
-                background: 'rgba(34,197,94,0.08)',
-                border: '1px solid rgba(34,197,94,0.25)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border)',
                 borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
+                fontSize: '0.9rem',
                 color: 'var(--text-secondary)',
               }}
             >
-              You voted for: <strong style={{ color: 'var(--text-primary)' }}>{candidate?.symbol} {candidate?.name}</strong>
+              You voted for: <strong style={{ color: 'var(--text-primary)', display: 'block', fontSize: '1.1rem', marginTop: 'var(--space-1)' }}>{candidate?.symbol} {candidate?.name}</strong>
             </div>
-            <button className="btn btn-primary" onClick={onClose} aria-label="Close simulation and return to guide">
+            <button className="btn btn-primary" onClick={onClose} aria-label="Close simulation and return to guide" style={{ width: '100%' }}>
               Back to Guide
             </button>
           </div>

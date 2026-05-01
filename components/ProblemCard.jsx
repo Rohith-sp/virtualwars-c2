@@ -9,52 +9,72 @@ export default function ProblemCard({ problem, onNavigate }) {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
-    <button
-      className="card-glass"
+    <div
+      role="button"
+      tabIndex={0}
+      className="card"
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
       aria-label={`${problem.problem} — click to get help`}
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--space-3)',
-        padding: 'var(--space-5)',
+        alignItems: 'flex-start',
+        gap: 'var(--space-4)',
+        padding: 'var(--space-6)',
         textAlign: 'left',
         cursor: 'pointer',
         width: '100%',
-        border: '1px solid var(--border-subtle)',
-        transition: 'transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease)',
+        height: '100%',
+        transition: 'transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast)',
+        outline: 'none',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-3px)';
-        e.currentTarget.style.borderColor = 'var(--color-primary)';
-        e.currentTarget.style.boxShadow = 'var(--shadow-glow)';
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.borderColor = 'var(--accent-blue)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transform = '';
-        e.currentTarget.style.borderColor = 'var(--border-subtle)';
-        e.currentTarget.style.boxShadow = '';
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.borderColor = 'var(--border)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.borderColor = 'var(--border-focus)';
+        e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-blue-light)';
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.borderColor = 'var(--border)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-3)' }}>
-        <span style={{ fontSize: '1.75rem' }} aria-hidden="true">{problem.emoji}</span>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-3)', width: '100%' }}>
+        <span style={{ fontSize: '2rem', lineHeight: 1 }} aria-hidden="true">{problem.emoji}</span>
         <span className={`badge badge-${problem.urgency}`}>
           {URGENCY_LABEL[problem.urgency]}
         </span>
       </div>
 
-      <div>
-        <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9375rem', marginBottom: 'var(--space-2)' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.05rem', marginBottom: 'var(--space-2)' }}>
           {problem.problem}
         </div>
-        <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
           {problem.solution}
         </div>
       </div>
 
-      <div style={{ fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600 }}>
-        Get help →
+      <div style={{ fontSize: '0.85rem', color: 'var(--accent-blue)', fontWeight: 600, marginTop: 'var(--space-2)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        Get help <span style={{ fontSize: '1.1em' }}>→</span>
       </div>
-    </button>
+    </div>
   );
 }

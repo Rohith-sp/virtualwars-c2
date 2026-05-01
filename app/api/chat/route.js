@@ -7,19 +7,7 @@ const GEMINI_TIMEOUT_MS = 8000;
 // ── Startup / build-time environment validation ───────────────────────────────
 // Throws at module-load time so a misconfigured deployment fails fast rather
 // than surfacing as a 503 to the first real user.
-const REQUIRED_ENV_VARS = [
-  'GEMINI_API_KEY',
-  'UPSTASH_REDIS_REST_URL',
-  'UPSTASH_REDIS_REST_TOKEN',
-];
-for (const key of REQUIRED_ENV_VARS) {
-  if (!process.env[key]) {
-    throw new Error(
-      `[VoteGuide] Missing required environment variable: ${key}.\n` +
-        `Set it in .env.local for development or in your deployment environment for production.`,
-    );
-  }
-}
+// Validation moved inside POST to avoid build-time errors
 
 // ── CORS helpers ──────────────────────────────────────────────────────────────
 function getAllowedOrigins() {
@@ -55,6 +43,18 @@ export async function OPTIONS(request) {
 
 // ── Route handler ─────────────────────────────────────────────────────────────
 export async function POST(request) {
+  const REQUIRED_ENV_VARS = [
+    'GEMINI_API_KEY',
+    'UPSTASH_REDIS_REST_URL',
+    'UPSTASH_REDIS_REST_TOKEN',
+  ];
+  for (const key of REQUIRED_ENV_VARS) {
+    if (!process.env[key]) {
+      console.error(`[VoteGuide] Missing required environment variable: ${key}`);
+      return Response.json({ error: 'Server misconfiguration.' }, { status: 500 });
+    }
+  }
+
   // ── CORS check ────────────────────────────────────────────────────────────
   const origin = request.headers.get('origin') ?? '';
   const allowedOrigins = getAllowedOrigins();

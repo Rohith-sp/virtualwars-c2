@@ -1,13 +1,24 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import flows from '@/data/flows.json';
 import { buildIndex, getNode, getOptions, isTerminal } from '@/lib/flowEngine';
 import { trackEvent, GA_EVENTS } from '@/lib/analytics';
 
+// Simple depth calculator for progress bar
+function getMaxDepth(index, startId, memo = {}) {
+  if (memo[startId]) return memo[startId];
+  const node = getNode(index, startId);
+  if (!node || isTerminal(node)) return 1;
+  const opts = getOptions(node);
+  if (!opts.length) return 1;
+  const depths = opts.map(o => getMaxDepth(index, o.nextId, memo));
+  const max = 1 + Math.max(...depths);
+  memo[startId] = max;
+  return max;
+}
+
 export default function FlowChat({ initialNodeId = 'root' }) {
-  // Build index once on mount — O(1) lookups from here on.
-  // intentionally omitted initialNodeId from deps — re-indexing on node change is not desired.
   const flowIndex = useMemo(() => {
     trackEvent(GA_EVENTS.FLOW_STARTED, { node_id: initialNodeId });
     return buildIndex(flows);
@@ -15,134 +26,210 @@ export default function FlowChat({ initialNodeId = 'root' }) {
 
   const [currentId, setCurrentId] = useState(initialNodeId);
   const [history, setHistory] = useState([]);
+  const containerRef = useRef(null);
 
   const currentNode = getNode(flowIndex, currentId);
   const options = getOptions(currentNode);
   const terminal = isTerminal(currentNode);
 
-  const handleOption = (option) => {
+  // Progress calculation
+  const maxDepth = useMemo(() => getMaxDepth(flowIndex, initialNodeId), [flowIndex, initialNodeId]);
+  const progressPercent = Math.min(100, Math.round(((history.length + 1) / maxDepth) * 100));
+
+  const handleOption = useCallback((option) => {
     setHistory((h) => [...h, currentId]);
     setCurrentId(option.nextId);
     if (isTerminal(getNode(flowIndex, option.nextId))) {
       trackEvent(GA_EVENTS.FLOW_COMPLETED, { terminal_node: option.nextId });
     }
-  };
+  }, [currentId, flowIndex]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     if (history.length === 0) return;
     const prev = history[history.length - 1];
     setHistory((h) => h.slice(0, -1));
     setCurrentId(prev);
-  };
+  }, [history]);
 
-  const handleRestart = () => {
+  const handleRestart = useCallback(() => {
     setHistory([]);
     setCurrentId(initialNodeId);
     trackEvent(GA_EVENTS.FLOW_STARTED, { node_id: initialNodeId });
-  };
+  }, [initialNodeId]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        handleBack();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleBack]);
 
   if (!currentNode) {
     return (
-      <div className="card-glass" style={{ padding: 'var(--space-6)' }}>
-        <p style={{ color: 'var(--color-danger)' }}>Error: flow node not found.</p>
+      <div className="card" style={{ padding: 'var(--space-6)' }}>
+        <p style={{ color: 'var(--accent-red)' }}>Error: flow node not found.</p>
       </div>
     );
   }
 
-  const nodeTypeColor = {
-    question: 'var(--color-primary)',
-    info: 'var(--color-secondary)',
-    terminal: 'var(--color-success)',
-  };
+  const isInfoOrTerminal = terminal || currentNode.type === 'info';
 
   return (
     <div
-      className="card-glass"
-      style={{ padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}
+      ref={containerRef}
+      className="card"
+      style={{
+        padding: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        position: 'relative',
+      }}
     >
-      {/* Type badge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-        <span
-          style={{
-            display: 'inline-block',
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: nodeTypeColor[currentNode.type] ?? 'var(--text-muted)',
-            flexShrink: 0,
-          }}
-          aria-hidden="true"
-        />
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          {currentNode.type === 'terminal' ? '✓ Answer Ready' : currentNode.type === 'info' ? 'Information' : 'Question'}
-        </span>
-        {history.length > 0 && (
-          <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Step {history.length + 1}
-          </span>
-        )}
-      </div>
+      <style>{`
+        .flow-option {
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          color: var(--text-primary);
+          padding: var(--space-3) var(--space-4);
+          border-radius: var(--radius-md);
+          cursor: pointer;
+          font-family: var(--font-body);
+          font-weight: 500;
+          text-align: left;
+          transition: background var(--transition-fast), border var(--transition-fast), transform var(--transition-fast);
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+        }
+        .flow-option:hover, .flow-option:focus-visible {
+          background: var(--bg-hover);
+          border-color: var(--accent-blue);
+          outline: none;
+        }
+        .flow-option.active {
+          background: var(--accent-saffron-light);
+          border-color: var(--accent-saffron);
+          color: var(--accent-saffron);
+        }
+        .flow-reveal {
+          animation: slideUp 200ms ease forwards;
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-      {/* Node text */}
+      {/* Progress Bar */}
       <div
         style={{
-          background: 'var(--bg-surface-2)',
-          borderRadius: 'var(--radius-md)',
-          padding: 'var(--space-5)',
-          borderLeft: `3px solid ${nodeTypeColor[currentNode.type] ?? 'var(--border-subtle)'}`,
+          height: '4px',
+          background: 'var(--bg-subtle)',
+          width: '100%',
         }}
       >
-        <p style={{ color: 'var(--text-primary)', lineHeight: 1.75, fontSize: '0.9375rem', whiteSpace: 'pre-line' }}>
-          {currentNode.text}
-        </p>
+        <div
+          style={{
+            height: '100%',
+            background: 'var(--accent-saffron)',
+            width: `${progressPercent}%`,
+            transition: 'width var(--transition-base)',
+          }}
+        />
       </div>
 
-      {/* Options — real <button> elements, keyboard navigable */}
-      {options.length > 0 && (
-        <div
-          role="group"
-          aria-label="Select your answer"
-          style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}
-        >
-          {options.map((opt) => (
-            <button
-              key={opt.nextId}
-              className="btn btn-ghost"
-              onClick={() => handleOption(opt)}
-              style={{ justifyContent: 'flex-start', textAlign: 'left' }}
-            >
-              <span aria-hidden="true" style={{ color: 'var(--color-primary)', flexShrink: 0 }}>›</span>
-              {opt.label}
-            </button>
-          ))}
+      <div style={{ padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+        {/* Type badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
+            {currentNode.type === 'terminal' ? '✓ Answer Ready' : currentNode.type === 'info' ? 'Information' : 'Question'}
+          </span>
+          {history.length > 0 && (
+            <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Step {history.length + 1}
+            </span>
+          )}
         </div>
-      )}
 
-      {/* Terminal CTA */}
-      {terminal && currentNode.ctaUrl && (
-        <a
-          href={currentNode.ctaUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-primary"
-          aria-label={`${currentNode.ctaLabel} — opens in new tab`}
+        {/* Node text */}
+        <div
+          key={currentId} // Remount to re-trigger animation
+          className="flow-reveal"
+          style={{
+            background: isInfoOrTerminal ? 'var(--accent-blue-light)' : 'transparent',
+            borderRadius: isInfoOrTerminal ? 'var(--radius-md)' : 0,
+            padding: isInfoOrTerminal ? 'var(--space-5)' : 0,
+            borderLeft: isInfoOrTerminal ? '3px solid var(--accent-blue)' : 'none',
+          }}
         >
-          {currentNode.ctaLabel} →
-        </a>
-      )}
+          <p style={{
+            color: 'var(--text-primary)',
+            lineHeight: 1.6,
+            fontSize: isInfoOrTerminal ? '0.95rem' : '1.125rem',
+            fontWeight: 500,
+            whiteSpace: 'pre-line',
+            display: 'flex',
+            gap: 'var(--space-3)',
+          }}>
+            {isInfoOrTerminal && <span style={{ flexShrink: 0 }}>ℹ️</span>}
+            {currentNode.text}
+          </p>
+        </div>
 
-      {/* Nav controls */}
-      <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-        {history.length > 0 && (
-          <button className="btn btn-outline btn-sm" onClick={handleBack} aria-label="Go back to previous question">
-            ← Back
-          </button>
+        {/* Options */}
+        {options.length > 0 && (
+          <div
+            role="group"
+            aria-label="Select your answer"
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}
+          >
+            {options.map((opt, i) => (
+              <button
+                key={`${currentId}-${opt.nextId}`}
+                className="flow-option flow-reveal"
+                onClick={() => handleOption(opt)}
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <span aria-hidden="true" style={{ color: 'var(--text-muted)', flexShrink: 0 }}>›</span>
+                {opt.label}
+              </button>
+            ))}
+          </div>
         )}
-        {(terminal || history.length > 0) && (
-          <button className="btn btn-outline btn-sm" onClick={handleRestart} aria-label="Restart the flow from the beginning">
-            ↺ Restart
-          </button>
+
+        {/* Terminal CTA */}
+        {terminal && currentNode.ctaUrl && (
+          <div className="flow-reveal" style={{ animationDelay: '100ms' }}>
+            <a
+              href={currentNode.ctaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+              aria-label={`${currentNode.ctaLabel} — opens in new tab`}
+            >
+              {currentNode.ctaLabel} →
+            </a>
+          </div>
         )}
+
+        {/* Nav controls */}
+        <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', marginTop: 'var(--space-2)' }}>
+          {history.length > 0 && (
+            <button className="btn btn-ghost btn-sm" onClick={handleBack} aria-label="Go back to previous question">
+              ← Back
+            </button>
+          )}
+          {(terminal || history.length > 0) && (
+            <button className="btn btn-ghost btn-sm" onClick={handleRestart} aria-label="Restart the flow from the beginning">
+              ↺ Restart
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -5,16 +5,21 @@ import { useState } from 'react';
 export default function FormCard({ form }) {
   const [open, setOpen] = useState(false);
 
+  // Remap specific accents if needed, or rely on form.accentColor if we updated forms.json.
+  // Assuming form.accentColor might be old colors. We'll use Civic White generic colors or map them.
+  const color = 'var(--accent-blue)';
+
   return (
     <article
-      className="card-glass"
+      id={form.id}
+      className="card"
       style={{
-        borderTop: `3px solid ${form.accentColor}`,
+        borderTop: `4px solid ${color}`,
         padding: 'var(--space-6)',
         display: 'flex',
         flexDirection: 'column',
         gap: 'var(--space-4)',
-        animation: 'fadeSlideUp var(--dur-slow) var(--ease) both',
+        textAlign: 'left'
       }}
       aria-label={`${form.number}: ${form.title}`}
     >
@@ -22,7 +27,7 @@ export default function FormCard({ form }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
         <span style={{ fontSize: '2rem' }} aria-hidden="true">{form.emoji}</span>
         <div>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: form.accentColor, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             {form.number}
           </div>
           <h3 style={{ color: 'var(--text-primary)', marginTop: '2px' }}>{form.title}</h3>
@@ -31,25 +36,25 @@ export default function FormCard({ form }) {
 
       {/* Meta */}
       <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>
           ⏱ {form.processingDays}
         </span>
       </div>
 
-      <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+      <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
         <strong style={{ color: 'var(--text-primary)' }}>Eligible if: </strong>
         {form.eligibility}
       </p>
 
       {/* Documents */}
       <div>
-        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 'var(--space-2)' }}>
+        <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 'var(--space-2)' }}>
           Documents Required
         </div>
         <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {form.documents.map((doc, i) => (
-            <li key={i} style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', display: 'flex', gap: '8px' }}>
-              <span style={{ color: form.accentColor, flexShrink: 0 }}>•</span>
+            <li key={i} style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', gap: '8px' }}>
+              <span style={{ color, flexShrink: 0 }}>•</span>
               {doc}
             </li>
           ))}
@@ -63,10 +68,10 @@ export default function FormCard({ form }) {
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-controls={`steps-${form.id}`}
-          style={{ width: '100%', justifyContent: 'space-between' }}
+          style={{ width: '100%', justifyContent: 'space-between', border: '1px solid var(--border)' }}
         >
-          <span>Step-by-step guide</span>
-          <span aria-hidden="true" style={{ transition: 'transform var(--dur-fast) var(--ease)', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+          <span style={{color: 'var(--text-primary)'}}>Step-by-step guide</span>
+          <span aria-hidden="true" style={{ color: 'var(--text-muted)', transition: 'transform var(--transition-fast)', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
         </button>
 
         {open && (
@@ -81,7 +86,7 @@ export default function FormCard({ form }) {
             }}
           >
             {form.steps.map((step, i) => (
-              <li key={i} style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              <li key={i} style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 {step}
               </li>
             ))}
@@ -94,8 +99,9 @@ export default function FormCard({ form }) {
         href={form.onlineUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="btn btn-primary btn-sm"
+        className="btn btn-primary"
         aria-label={`Apply for ${form.number} online at ECI portal`}
+        style={{ marginTop: 'auto' }}
       >
         Apply Online →
       </a>

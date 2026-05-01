@@ -1,113 +1,123 @@
 'use client';
 
 import { useState, useRef } from 'react';
-
-// html2canvas captures a styled <div> — avoids raw canvas toBlob() privacy blocks
-// on static hosts (Firebase, Vercel) that can silently return blank PNGs.
+import { showToast } from '@/components/Toast';
 
 export default function ShareCard() {
   const [name, setName] = useState('');
   const [generating, setGenerating] = useState(false);
-  const [shareError, setShareError] = useState('');
   const cardRef = useRef(null);
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
     setGenerating(true);
-    setShareError('');
     try {
       const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: '#0f1b35',
-        scale: 2,           // retina quality
+        backgroundColor: '#FFFFFF',
+        scale: 2,
         useCORS: true,
         logging: false,
       });
 
-      // Direct download the image
-      canvas.toBlob((blob) => triggerDownload(blob), 'image/png');
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'my-voter-card.png';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Voter card downloaded successfully!', 'success');
+      }, 'image/png');
     } catch {
-      setShareError('Could not generate image. Please try again.');
+      showToast('Could not generate image. Please try again.', 'error');
     } finally {
       setGenerating(false);
     }
-  };
-
-  const triggerDownload = (blob) => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'my-voter-card.png';
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   const displayName = name.trim() || 'Your Name';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-6)' }}>
-      <div
-        ref={cardRef}
-        style={{
-          width: '360px',
-          padding: '48px 32px',
-          background: '#060c18', /* Solid navy base */
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '24px',
-          textAlign: 'center',
-          fontFamily: 'var(--font-body)',
-          userSelect: 'none',
-          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.45)', /* simple clean shadow */
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-        aria-hidden="true"
-      >
-        {/* Top Accent Line */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: '#ffffff' }} />
+      <style>{`
+        .share-card-wrapper {
+          width: 360px;
+          max-width: 100%;
+        }
+        @media (max-width: 480px) {
+          .share-card-wrapper {
+            transform: scale(0.9);
+            transform-origin: top center;
+            margin-bottom: -10%;
+          }
+          .share-download-btn {
+            width: 100%;
+          }
+        }
+      `}</style>
+      
+      <div className="share-card-wrapper">
+        <div
+          ref={cardRef}
+          style={{
+            width: '360px',
+            padding: '48px 32px',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-lg)',
+            textAlign: 'center',
+            fontFamily: 'var(--font-body)',
+            userSelect: 'none',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+          aria-hidden="true"
+        >
+          {/* Top Saffron Accent Line */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--accent-saffron)' }} />
 
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🇮🇳</div>
-          <div style={{ fontSize: '0.7rem', letterSpacing: '0.25em', color: '#a8b8d8', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 600 }}>
-            Election Commission of India
-          </div>
-          <div style={{ 
-            fontFamily: 'var(--font-display)', 
-            fontSize: '1.75rem', 
-            fontWeight: 800, 
-            color: '#ffffff', 
-            marginBottom: '8px',
-            lineHeight: 1.2
-          }}>
-            {displayName}
-          </div>
-          <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '28px', fontStyle: 'italic' }}>
-            Proud Registered Voter
-          </div>
-          <div
-            style={{
-              display: 'inline-block',
-              background: 'rgba(255,107,53,0.1)',
-              border: '1px solid rgba(255,107,53,0.5)',
-              color: '#ffffff',
-              fontWeight: 700,
-              fontSize: '0.8rem',
-              padding: '10px 24px',
-              borderRadius: '9999px',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              boxShadow: '0 4px 12px rgba(255,107,53,0.15)'
-            }}
-          >
-            I Will Vote
-          </div>
-          <div style={{ marginTop: '32px', fontSize: '0.75rem', color: '#6b7fa3', fontWeight: 500 }}>
-            voters.eci.gov.in • 1950 Helpline
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🇮🇳</div>
+            <div style={{ fontSize: '0.7rem', letterSpacing: '0.25em', color: 'var(--accent-blue)', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 600 }}>
+              Election Commission of India
+            </div>
+            <div style={{ 
+              fontFamily: 'var(--font-display)', 
+              fontSize: '1.75rem', 
+              fontWeight: 700, 
+              color: 'var(--text-primary)', 
+              marginBottom: '8px',
+              lineHeight: 1.2
+            }}>
+              {displayName}
+            </div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '28px', fontStyle: 'italic' }}>
+              Proud Registered Voter
+            </div>
+            <div
+              style={{
+                display: 'inline-block',
+                background: 'var(--accent-saffron-light)',
+                border: '1px solid var(--accent-saffron)',
+                color: 'var(--accent-saffron)',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                padding: '10px 24px',
+                borderRadius: 'var(--radius-pill)',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+              }}
+            >
+              I Will Vote
+            </div>
+            <div style={{ marginTop: '32px', fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+              voters.eci.gov.in • 1950 Helpline
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Name input */}
       <div style={{ width: '100%', maxWidth: '360px', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
         <input
           id="share-name-input"
@@ -118,23 +128,18 @@ export default function ShareCard() {
           placeholder="Enter your name (optional)"
           maxLength={40}
           aria-label="Your name for the voter card"
+          style={{ textAlign: 'center' }}
         />
 
         <button
-          className="btn btn-primary"
+          className="btn btn-primary share-download-btn"
           onClick={handleDownload}
           disabled={generating}
           aria-label="Download your voter card as a PNG image"
           style={{ justifyContent: 'center' }}
         >
-          {generating ? 'Generating…' : '⬇ Download Voter Card'}
+          {generating ? 'Generating…' : '⬇ Download Card'}
         </button>
-
-        {shareError && (
-          <p role="alert" style={{ fontSize: '0.8rem', color: 'var(--color-danger)', textAlign: 'center' }}>
-            {shareError}
-          </p>
-        )}
       </div>
     </div>
   );

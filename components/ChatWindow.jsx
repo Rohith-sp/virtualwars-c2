@@ -4,13 +4,12 @@ import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { trackEvent, GA_EVENTS } from '@/lib/analytics';
 
 const MAX_CHARS = 500;
-const MAX_HISTORY_TURNS = 6; // last 6 turns (3 user + 3 assistant) sent for context
+const MAX_HISTORY_TURNS = 6;
 
 function sanitize(str) {
   return String(str).trim().slice(0, MAX_CHARS);
 }
 
-// Auto-resize a textarea to fit its content
 function autoResize(el) {
   if (!el) return;
   el.style.height = 'auto';
@@ -18,6 +17,12 @@ function autoResize(el) {
 }
 
 export default function ChatWindow({ onClose }) {
+  const starterChips = [
+    "How to register to vote?",
+    "Lost my Voter ID",
+    "What is NOTA?",
+  ];
+
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -37,7 +42,6 @@ export default function ChatWindow({ onClose }) {
     }
   }, [messages, loading]);
 
-  // Auto-grow textarea on input change
   useEffect(() => {
     autoResize(textareaRef.current);
   }, [input]);
@@ -47,7 +51,6 @@ export default function ChatWindow({ onClose }) {
     [messages],
   );
 
-  // Build a trimmed history slice to send with each request for context
   const buildHistory = useCallback(
     (currentMessages) =>
       currentMessages
@@ -62,9 +65,9 @@ export default function ChatWindow({ onClose }) {
   }, [onClose]);
 
   const handleSubmit = useCallback(
-    async (e) => {
-      e?.preventDefault();
-      const question = sanitize(input);
+    async (e, predefinedQuestion = null) => {
+      if (e?.preventDefault) e.preventDefault();
+      const question = sanitize(predefinedQuestion || input);
       if (!question || loading) return;
 
       setInput('');
@@ -156,30 +159,37 @@ export default function ChatWindow({ onClose }) {
           height: '100%',
           overflow: 'hidden',
           background: 'var(--bg-base)',
-          borderLeft: '1px solid var(--border-subtle)',
+          borderLeft: '1px solid var(--border)',
         }}
       >
         {/* ── Header ── */}
         <div
           style={{
             padding: 'var(--space-4) var(--space-5)',
-            borderBottom: '1px solid var(--border-subtle)',
+            borderBottom: '1px solid var(--border)',
             display: 'flex',
             alignItems: 'center',
             gap: 'var(--space-3)',
             flexShrink: 0,
+            background: 'var(--bg-surface)',
           }}
         >
           <div
             style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: 'var(--color-success)',
-              flexShrink: 0,
+              width: '32px',
+              height: '32px',
+              borderRadius: 'var(--radius-pill)',
+              background: 'var(--accent-blue-light)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1rem',
+              color: 'var(--accent-blue)',
             }}
             aria-hidden="true"
-          />
+          >
+            🗳️
+          </div>
           <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9375rem' }}>
             AI Election Assistant
           </span>
@@ -224,24 +234,48 @@ export default function ChatWindow({ onClose }) {
               key={msg.key}
               style={{
                 display: 'flex',
+                gap: 'var(--space-3)',
+                alignItems: 'flex-start',
                 justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
               }}
             >
+              {msg.role === 'assistant' && (
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: 'var(--radius-pill)',
+                    background: 'var(--accent-blue-light)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1rem',
+                    flexShrink: 0,
+                    marginTop: '2px',
+                  }}
+                  aria-hidden="true"
+                >
+                  🗳️
+                </div>
+              )}
               <div
                 style={{
-                  maxWidth: '82%',
+                  maxWidth: msg.role === 'user' ? '75%' : '80%',
                   padding: 'var(--space-3) var(--space-4)',
                   borderRadius:
                     msg.role === 'user'
-                      ? 'var(--radius-md) var(--radius-md) 4px var(--radius-md)'
-                      : 'var(--radius-md) var(--radius-md) var(--radius-md) 4px',
+                      ? '16px 16px 4px 16px'
+                      : '16px 16px 16px 4px',
                   background:
-                    msg.role === 'user' ? 'var(--color-primary)' : 'var(--bg-surface-2)',
+                    msg.role === 'user' ? 'var(--accent-saffron)' : 'var(--bg-surface)',
                   color:
-                    msg.role === 'user' ? 'var(--color-primary-text)' : 'var(--text-primary)',
+                    msg.role === 'user' ? 'var(--text-inverse)' : 'var(--text-primary)',
+                  border: msg.role === 'assistant' ? '1px solid var(--border)' : 'none',
+                  borderLeft: msg.role === 'assistant' ? '3px solid var(--accent-blue)' : 'none',
                   fontSize: '0.875rem',
                   lineHeight: 1.65,
                   wordBreak: 'break-word',
+                  boxShadow: msg.role === 'user' ? 'var(--shadow-sm)' : 'none',
                 }}
               >
                 {msg.text}
@@ -249,18 +283,64 @@ export default function ChatWindow({ onClose }) {
             </div>
           ))}
 
+          {/* Starter Chips */}
+          {messages.length === 1 && !loading && (
+            <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'var(--space-2)' }}>
+              {starterChips.map(chip => (
+                <button
+                  key={chip}
+                  onClick={(e) => handleSubmit(e, chip)}
+                  style={{
+                    background: 'var(--accent-blue-light)',
+                    color: 'var(--accent-blue)',
+                    border: '1px solid var(--accent-blue)',
+                    borderRadius: 'var(--radius-pill)',
+                    padding: 'var(--space-2) var(--space-3)',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--accent-blue)'; e.currentTarget.style.color = 'var(--text-inverse)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--accent-blue-light)'; e.currentTarget.style.color = 'var(--accent-blue)'; }}
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Typing indicator */}
           {loading && (
-            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-start', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--radius-pill)',
+                  background: 'var(--accent-blue-light)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1rem',
+                  flexShrink: 0,
+                  marginTop: '2px',
+                }}
+                aria-hidden="true"
+              >
+                🗳️
+              </div>
               <div
                 aria-label="Assistant is typing"
                 style={{
                   display: 'flex',
                   gap: 5,
                   padding: 'var(--space-3) var(--space-4)',
-                  background: 'var(--bg-surface-2)',
-                  borderRadius: 'var(--radius-md) var(--radius-md) var(--radius-md) 4px',
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  borderLeft: '3px solid var(--accent-blue)',
+                  borderRadius: '16px 16px 16px 4px',
                   alignItems: 'center',
+                  height: '42px',
                 }}
               >
                 {[0, 1, 2].map((i) => (
@@ -269,10 +349,10 @@ export default function ChatWindow({ onClose }) {
                     className="chat-dot"
                     aria-hidden="true"
                     style={{
-                      width: 7,
-                      height: 7,
+                      width: 6,
+                      height: 6,
                       borderRadius: '50%',
-                      background: 'var(--text-muted)',
+                      background: 'var(--accent-blue)',
                       display: 'block',
                     }}
                   />
@@ -287,11 +367,11 @@ export default function ChatWindow({ onClose }) {
               role="alert"
               style={{
                 padding: 'var(--space-3) var(--space-4)',
-                background: 'rgba(239,68,68,0.08)',
-                border: '1px solid rgba(239,68,68,0.25)',
+                background: 'rgba(192,57,43,0.08)',
+                border: '1px solid rgba(192,57,43,0.25)',
                 borderRadius: 'var(--radius-md)',
                 fontSize: '0.8125rem',
-                color: 'var(--color-danger)',
+                color: 'var(--accent-red)',
                 lineHeight: 1.5,
               }}
             >
@@ -305,11 +385,12 @@ export default function ChatWindow({ onClose }) {
           onSubmit={handleSubmit}
           style={{
             padding: 'var(--space-3) var(--space-4)',
-            borderTop: '1px solid var(--border-subtle)',
+            borderTop: '1px solid var(--border)',
             display: 'flex',
             flexDirection: 'column',
             gap: 6,
             flexShrink: 0,
+            background: 'var(--bg-surface)',
           }}
         >
           <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-end' }}>
@@ -328,20 +409,31 @@ export default function ChatWindow({ onClose }) {
                 flex: 1,
                 lineHeight: 1.5,
                 overflowY: 'auto',
-                minHeight: 38,
+                minHeight: 44,
                 maxHeight: 140,
+                borderRadius: 'var(--radius-md)',
               }}
               maxLength={MAX_CHARS}
               disabled={loading}
             />
             <button
               type="submit"
-              className="btn btn-primary btn-sm chat-send-btn"
+              className="btn btn-primary chat-send-btn"
               disabled={!input.trim() || loading}
               aria-label="Send message"
-              style={{ flexShrink: 0, alignSelf: 'flex-end' }}
+              style={{ 
+                flexShrink: 0, 
+                alignSelf: 'flex-end', 
+                width: 44, 
+                height: 44, 
+                padding: 0,
+                borderRadius: 'var(--radius-md)',
+              }}
             >
-              Send
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
             </button>
           </div>
 
@@ -351,7 +443,7 @@ export default function ChatWindow({ onClose }) {
               aria-live="polite"
               style={{
                 fontSize: '0.75rem',
-                color: charsLeft < 20 ? 'var(--color-danger)' : 'var(--text-muted)',
+                color: charsLeft < 20 ? 'var(--accent-red)' : 'var(--text-muted)',
                 textAlign: 'right',
                 paddingRight: 2,
               }}

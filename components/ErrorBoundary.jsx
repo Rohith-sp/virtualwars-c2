@@ -25,15 +25,18 @@ class ErrorBoundary extends React.Component {
             alignItems: 'center',
             justifyContent: 'center',
             padding: '2rem',
-            minHeight: '300px',
+            minHeight: '200px',
             flexDirection: 'column',
             gap: 'var(--space-4)',
             textAlign: 'center',
+            background: 'rgba(192, 57, 43, 0.05)',
+            border: '1px solid rgba(192, 57, 43, 0.2)',
+            borderRadius: 'var(--radius-md)',
           }}
         >
-          <p style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>This section couldn\'t load.</p>
+          <p style={{ color: 'var(--accent-red)', fontSize: '1rem', fontWeight: 500 }}>⚠️ This section couldn't load.</p>
           <button
-            className="btn btn-primary"
+            className="btn btn-outline"
             onClick={() => this.setState({ hasError: false })}
           >
             Retry

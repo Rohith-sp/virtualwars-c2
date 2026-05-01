@@ -33,8 +33,8 @@ export default function FactsTicker() {
         alignItems: 'flex-start',
         gap: '0.75rem',
         padding: '0.875rem 1.25rem',
-        background: 'var(--color-primary-dim)',
-        border: '1px solid var(--border-glow)',
+        background: 'var(--accent-blue-light)',
+        borderLeft: '3px solid var(--accent-blue)',
         borderRadius: 'var(--radius-md)',
         maxWidth: '700px',
         transition: 'opacity 0.3s ease, transform 0.3s ease',
@@ -47,13 +47,13 @@ export default function FactsTicker() {
       <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>💡</span>
       <p
         style={{
-          color: 'var(--text-primary)',
-          fontSize: '0.875rem',
+          color: 'var(--text-secondary)',
+          fontSize: '0.9rem',
           lineHeight: 1.6,
           margin: 0,
         }}
       >
-        <strong style={{ color: 'var(--color-primary)' }}>Did you know? </strong>
+        <strong style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>Did you know? </strong>
         {fact}
       </p>
     </div>
