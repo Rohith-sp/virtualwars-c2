@@ -24,23 +24,8 @@ export default function ShareCard() {
         logging: false,
       });
 
-      // Try Web Share API first (mobile)
-      if (navigator.share && navigator.canShare) {
-        canvas.toBlob(async (blob) => {
-          const file = new File([blob], 'my-voter-card.png', { type: 'image/png' });
-          if (navigator.canShare({ files: [file] })) {
-            try {
-              await navigator.share({ files: [file], title: 'I am a registered voter!', text: 'Exercise your democratic right — register to vote today.' });
-              return;
-            } catch {
-              // User cancelled share or not supported — fall through to download
-            }
-          }
-          triggerDownload(blob);
-        }, 'image/png');
-      } else {
-        canvas.toBlob((blob) => triggerDownload(blob), 'image/png');
-      }
+      // Direct download the image
+      canvas.toBlob((blob) => triggerDownload(blob), 'image/png');
     } catch {
       setShareError('Could not generate image. Please try again.');
     } finally {
@@ -61,48 +46,68 @@ export default function ShareCard() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-6)' }}>
-      {/* Preview card — this div is what html2canvas captures */}
       <div
         ref={cardRef}
         style={{
           width: '360px',
-          padding: '40px 32px',
-          background: 'linear-gradient(135deg, #0f1b35 0%, #162347 100%)',
-          border: '2px solid rgba(255,107,53,0.4)',
-          borderRadius: '20px',
+          padding: '48px 32px',
+          background: 'linear-gradient(135deg, #070d1a 0%, #0f1b35 100%)',
+          border: '1px solid rgba(255,107,53,0.3)',
+          borderRadius: '24px',
           textAlign: 'center',
-          fontFamily: 'Georgia, serif',
+          fontFamily: 'var(--font-body)',
           userSelect: 'none',
+          boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
+          position: 'relative',
+          overflow: 'hidden'
         }}
         aria-hidden="true"
       >
-        <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🗳️</div>
-        <div style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: '#6b7fa3', textTransform: 'uppercase', marginBottom: '8px' }}>
-          Republic of India
-        </div>
-        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#f0f4ff', marginBottom: '4px' }}>
-          {displayName}
-        </div>
-        <div style={{ fontSize: '0.875rem', color: '#a8b8d8', marginBottom: '24px' }}>
-          is a registered voter
-        </div>
-        <div
-          style={{
-            display: 'inline-block',
-            background: '#ff6b35',
-            color: '#1a0800',
-            fontWeight: 800,
-            fontSize: '0.8125rem',
-            padding: '8px 20px',
-            borderRadius: '9999px',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-          }}
-        >
-          I Will Vote
-        </div>
-        <div style={{ marginTop: '20px', fontSize: '0.7rem', color: '#4a5a7a' }}>
-          voters.eci.gov.in • 1950 Voter Helpline
+        {/* Decorative Indian Flag Glows */}
+        <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '150px', height: '150px', background: 'rgba(255,153,51,0.3)', filter: 'blur(50px)', borderRadius: '50%' }} />
+        <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '150px', height: '150px', background: 'rgba(19,136,8,0.25)', filter: 'blur(50px)', borderRadius: '50%' }} />
+        
+        {/* Top Flag Line */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%)' }} />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🇮🇳</div>
+          <div style={{ fontSize: '0.7rem', letterSpacing: '0.25em', color: '#a8b8d8', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 600 }}>
+            Election Commission of India
+          </div>
+          <div style={{ 
+            fontFamily: 'var(--font-display)', 
+            fontSize: '1.75rem', 
+            fontWeight: 800, 
+            color: '#ffffff', 
+            marginBottom: '8px',
+            lineHeight: 1.2
+          }}>
+            {displayName}
+          </div>
+          <div style={{ fontSize: '0.9rem', color: '#ff8c5a', marginBottom: '28px', fontStyle: 'italic' }}>
+            Proud Registered Voter
+          </div>
+          <div
+            style={{
+              display: 'inline-block',
+              background: 'rgba(255,107,53,0.1)',
+              border: '1px solid rgba(255,107,53,0.5)',
+              color: '#ffffff',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              padding: '10px 24px',
+              borderRadius: '9999px',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              boxShadow: '0 4px 12px rgba(255,107,53,0.15)'
+            }}
+          >
+            I Will Vote
+          </div>
+          <div style={{ marginTop: '32px', fontSize: '0.75rem', color: '#6b7fa3', fontWeight: 500 }}>
+            voters.eci.gov.in • 1950 Helpline
+          </div>
         </div>
       </div>
 
