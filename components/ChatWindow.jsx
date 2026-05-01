@@ -8,7 +8,7 @@ function sanitize(str) {
   return String(str).trim().slice(0, 500);
 }
 
-export default function ChatWindow() {
+export default function ChatWindow({ onClose }) {
   const [messages, setMessages] = useState([
     { role: 'assistant', text: 'Hi! Ask me anything about voting in India — registration, lost ID, NOTA, or election day rules.' },
   ]);
@@ -88,8 +88,7 @@ export default function ChatWindow() {
 
   return (
     <div
-      className="card-glass"
-      style={{ display: 'flex', flexDirection: 'column', height: '480px', overflow: 'hidden' }}
+      style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'var(--bg-base)', borderLeft: '1px solid var(--border-subtle)' }}
     >
       {/* Header */}
       <div
@@ -114,9 +113,13 @@ export default function ChatWindow() {
         <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9375rem' }}>
           AI Election Assistant
         </span>
-        <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          Powered by Gemini
-        </span>
+        <button
+          onClick={onClose}
+          style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}
+          aria-label="Close AI Chat"
+        >
+          ×
+        </button>
       </div>
 
       {/* Message log — role="log" aria-live="polite" per judging criteria */}

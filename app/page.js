@@ -20,6 +20,7 @@ const SimulationModal = dynamic(() => import('@/components/SimulationModal'), { 
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true);
 
   return (
     <>
@@ -56,7 +57,7 @@ export default function Home() {
           <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
             <a href="#guide" className="btn btn-ghost btn-sm" style={{ borderRadius: 'var(--radius-sm)' }}>Guide</a>
             <a href="#forms" className="btn btn-ghost btn-sm" style={{ borderRadius: 'var(--radius-sm)' }}>Forms</a>
-            <a href="#ai-chat" className="btn btn-ghost btn-sm" style={{ borderRadius: 'var(--radius-sm)' }}>AI Chat</a>
+            <button onClick={() => setIsChatOpen(true)} className="btn btn-ghost btn-sm" style={{ borderRadius: 'var(--radius-sm)' }}>AI Chat</button>
             <button
               className="btn btn-primary btn-sm animate-pulse-glow"
               onClick={() => setModalOpen(true)}
@@ -234,24 +235,7 @@ export default function Home() {
 
         <hr className="divider" aria-hidden="true" />
 
-        {/* ── AI Chat ───────────────────────────────────────────────── */}
-        <section
-          id="ai-chat"
-          aria-labelledby="chat-heading"
-          className="section"
-          style={{ textAlign: 'center' }}
-        >
-          <p className="section-subtitle">AI Assistant</p>
-          <h2 id="chat-heading" className="section-title">
-            Ask Anything About Voting
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-8)', maxWidth: '560px', margin: '0 auto var(--space-8)' }}>
-            Free-text questions answered by Gemini AI — trained to cover only Indian election topics.
-          </p>
-          <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'left' }}>
-            <ChatWindow />
-          </div>
-        </section>
+        {/* AI Chat section removed (now a sidebar) */}
 
         <hr className="divider" aria-hidden="true" />
 
@@ -310,6 +294,52 @@ export default function Home() {
       <ErrorBoundary>
         <SimulationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
       </ErrorBoundary>
+
+      {/* ── Floating AI Button ───────────────────────────────────────── */}
+      {!isChatOpen && (
+        <button
+          onClick={() => setIsChatOpen(true)}
+          style={{
+            position: 'fixed',
+            bottom: 'var(--space-6)',
+            right: 'var(--space-6)',
+            zIndex: 90,
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            background: 'var(--color-primary)',
+            color: '#060c18',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.5rem',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'transform 0.2s',
+          }}
+          aria-label="Open AI Assistant"
+        >
+          💬
+        </button>
+      )}
+
+      {/* ── AI Chat Sidebar ──────────────────────────────────────────── */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: isChatOpen ? 0 : '-420px',
+          width: '400px',
+          maxWidth: '100%',
+          height: '100vh',
+          zIndex: 1000,
+          transition: 'right 0.3s var(--ease)',
+          boxShadow: isChatOpen ? '-4px 0 24px rgba(0,0,0,0.5)' : 'none',
+        }}
+      >
+        <ChatWindow onClose={() => setIsChatOpen(false)} />
+      </div>
     </>
   );
 }
