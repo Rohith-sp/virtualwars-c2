@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { trackEvent, GA_EVENTS } from '@/lib/analytics';
 
 const MAX_CHARS = 500;
@@ -17,10 +18,13 @@ function autoResize(el) {
 }
 
 export default function ChatWindow({ onClose }) {
+  const tChat = useTranslations('chat');
+  const locale = useLocale();
+
   const starterChips = [
-    "How to register to vote?",
-    "Lost my Voter ID",
-    "What is NOTA?",
+    tChat('suggestedQuestions.register'),
+    tChat('suggestedQuestions.counting'),
+    tChat('suggestedQuestions.mcc'),
   ];
 
   const [messages, setMessages] = useState([
@@ -91,6 +95,7 @@ export default function ChatWindow({ onClose }) {
             question,
             history: buildHistory(nextMessages),
             session_id: sessionId.current,
+            locale,
           }),
         });
 
@@ -103,7 +108,7 @@ export default function ChatWindow({ onClose }) {
           return;
         }
         if (!res.ok) {
-          setError('Something went wrong. Please try again.');
+          setError(tChat('errorMessage'));
           return;
         }
 
@@ -401,7 +406,7 @@ export default function ChatWindow({ onClose }) {
               value={input}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Ask about voter registration, lost ID, NOTA…"
+              placeholder={tChat('placeholder')}
               rows={1}
               aria-label="Type your election question"
               style={{
@@ -420,7 +425,7 @@ export default function ChatWindow({ onClose }) {
               type="submit"
               className="btn btn-primary chat-send-btn"
               disabled={!input.trim() || loading}
-              aria-label="Send message"
+              aria-label={tChat('send')}
               style={{ 
                 flexShrink: 0, 
                 alignSelf: 'flex-end', 

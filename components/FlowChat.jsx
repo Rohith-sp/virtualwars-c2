@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import flows from '@/data/flows.json';
+import { useLocale, useTranslations } from 'next-intl';
 import { buildIndex, getNode, getOptions, isTerminal } from '@/lib/flowEngine';
 import { trackEvent, GA_EVENTS } from '@/lib/analytics';
 
@@ -19,21 +19,33 @@ function getMaxDepth(index, startId, memo = {}) {
 }
 
 export default function FlowChat({ initialNodeId = 'root' }) {
+  const locale = useLocale();
+  const tFlow = useTranslations('flow');
+  const [flows, setFlows] = useState(null);
+
+  useEffect(() => {
+    import(`@/data/flows/flows.${locale}.json`)
+      .then(mod => setFlows(mod.default))
+      .catch(() => import(`@/data/flows/flows.en.json`).then(mod => setFlows(mod.default)));
+  }, [locale]);
+
   const flowIndex = useMemo(() => {
+    if (!flows) return null;
     trackEvent(GA_EVENTS.FLOW_STARTED, { node_id: initialNodeId });
     return buildIndex(flows);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [flows]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [currentId, setCurrentId] = useState(initialNodeId);
   const [history, setHistory] = useState([]);
   const containerRef = useRef(null);
 
-  const currentNode = getNode(flowIndex, currentId);
-  const options = getOptions(currentNode);
-  const terminal = isTerminal(currentNode);
+  const safeFlowIndex = flowIndex || {};
+  const currentNode = getNode(safeFlowIndex, currentId);
+  const options = currentNode ? getOptions(currentNode) : [];
+  const terminal = currentNode ? isTerminal(currentNode) : false;
 
   // Progress calculation
-  const maxDepth = useMemo(() => getMaxDepth(flowIndex, initialNodeId), [flowIndex, initialNodeId]);
+  const maxDepth = useMemo(() => (flowIndex ? getMaxDepth(flowIndex, initialNodeId) : 1), [flowIndex, initialNodeId]);
   const progressPercent = Math.min(100, Math.round(((history.length + 1) / maxDepth) * 100));
 
   const handleOption = useCallback((option) => {
@@ -67,6 +79,14 @@ export default function FlowChat({ initialNodeId = 'root' }) {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleBack]);
+
+  if (!flows || !flowIndex) {
+    return (
+      <div className="card" style={{ padding: 'var(--space-6)' }}>
+        <p style={{ color: 'var(--text-muted)' }}>Loading guide...</p>
+      </div>
+    );
+  }
 
   if (!currentNode) {
     return (
@@ -221,12 +241,12 @@ export default function FlowChat({ initialNodeId = 'root' }) {
         <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', marginTop: 'var(--space-2)' }}>
           {history.length > 0 && (
             <button className="btn btn-ghost btn-sm" onClick={handleBack} aria-label="Go back to previous question">
-              ← Back
+              ← {tFlow('back')}
             </button>
           )}
           {(terminal || history.length > 0) && (
             <button className="btn btn-ghost btn-sm" onClick={handleRestart} aria-label="Restart the flow from the beginning">
-              ↺ Restart
+              ↺ {tFlow('startOver')}
             </button>
           )}
         </div>

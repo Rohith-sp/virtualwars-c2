@@ -86,6 +86,14 @@ body {
   min-height: 100vh;
 }
 
+html[data-locale="hi"], html[data-locale="mr"] { --font-body: var(--font-hi), system-ui, sans-serif; --font-display: var(--font-hi), serif; }
+html[data-locale="bn"] { --font-body: var(--font-bn), system-ui, sans-serif; --font-display: var(--font-bn), serif; }
+html[data-locale="te"] { --font-body: var(--font-te), system-ui, sans-serif; --font-display: var(--font-te), serif; }
+html[data-locale="ta"] { --font-body: var(--font-ta), system-ui, sans-serif; --font-display: var(--font-ta), serif; }
+html[data-locale="gu"] { --font-body: var(--font-gu), system-ui, sans-serif; --font-display: var(--font-gu), serif; }
+html[data-locale="kn"] { --font-body: var(--font-kn), system-ui, sans-serif; --font-display: var(--font-kn), serif; }
+html[data-locale="pa"] { --font-body: var(--font-pa), system-ui, sans-serif; --font-display: var(--font-pa), serif; }
+
 h1, h2, h3, h4 { color: var(--text-primary); font-family: var(--font-display); line-height: 1.2; }
 h1 { font-size: clamp(2rem, 5vw, 3.75rem); }
 h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); }

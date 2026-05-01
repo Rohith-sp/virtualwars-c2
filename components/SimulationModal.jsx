@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import ConfettiOverlay from '@/components/ConfettiOverlay';
 import { trackEvent, GA_EVENTS } from '@/lib/analytics';
 
@@ -40,6 +41,7 @@ function useFocusTrap(ref, active) {
 }
 
 export default function SimulationModal({ isOpen, onClose }) {
+  const t = useTranslations('simulation');
   const [phase, setPhase] = useState('selecting'); // selecting | voted
   const [selected, setSelected] = useState(null);
   const modalRef = useRef(null);
@@ -105,7 +107,7 @@ export default function SimulationModal({ isOpen, onClose }) {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>EVM Simulation</h2>
+          <h2 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>{t('title')}</h2>
           <button
             className="btn btn-ghost"
             onClick={onClose}
@@ -119,7 +121,7 @@ export default function SimulationModal({ isOpen, onClose }) {
         {phase === 'selecting' && (
           <>
             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-              This is a practice Electronic Voting Machine (EVM) simulation. Select your candidate and press Confirm.
+              {t('instruction')}
             </p>
             <div role="group" aria-label="Candidate list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {CANDIDATES.map((c) => {
@@ -151,8 +153,12 @@ export default function SimulationModal({ isOpen, onClose }) {
                       {c.symbol}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '1rem', fontFamily: 'var(--font-body)' }}>{c.name}</div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{c.party}</div>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '1rem', fontFamily: 'var(--font-body)' }}>
+                        {t(`candidates.${c.id}.name`)}
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                        {t(`candidates.${c.id}.party`)}
+                      </div>
                     </div>
                     {/* Fake EVM blue button indicator */}
                     <div style={{
@@ -175,7 +181,7 @@ export default function SimulationModal({ isOpen, onClose }) {
                 opacity: selected ? 1 : 0.4,
               }}
             >
-              Confirm Vote ✓
+              {t('confirm')} ✓
             </button>
           </>
         )}
@@ -193,10 +199,10 @@ export default function SimulationModal({ isOpen, onClose }) {
             </div>
             <div>
               <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: '2rem', marginBottom: 'var(--space-2)' }}>
-                Your vote has been recorded
+                {t('successTitle')}
               </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                In a real election, your vote is anonymous and final. Thank you for participating in democracy!
+                {t('successMessage')}
               </p>
             </div>
             <div
@@ -210,7 +216,7 @@ export default function SimulationModal({ isOpen, onClose }) {
                 color: 'var(--text-secondary)',
               }}
             >
-              You voted for: <strong style={{ color: 'var(--text-primary)', display: 'block', fontSize: '1.1rem', marginTop: 'var(--space-1)' }}>{candidate?.symbol} {candidate?.name}</strong>
+              You voted for: <strong style={{ color: 'var(--text-primary)', display: 'block', fontSize: '1.1rem', marginTop: 'var(--space-1)' }}>{candidate?.symbol} {t(`candidates.${candidate?.id}.name`)}</strong>
             </div>
             <button className="btn btn-primary" onClick={onClose} aria-label="Close simulation and return to guide" style={{ width: '100%' }}>
               Back to Guide

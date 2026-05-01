@@ -1,10 +1,12 @@
 import timeline from '@/data/timeline.json';
+import { useTranslations } from 'next-intl';
 
 export default function TimelineBanner() {
+  const t = useTranslations('timeline');
   return (
     <div style={{ textAlign: 'center', width: '100%', overflowX: 'auto', paddingBottom: 'var(--space-6)' }}>
-      <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>How Elections Work</p>
-      <h2 style={{ marginBottom: 'var(--space-12)' }}>The Election Timeline</h2>
+      <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>{t('subtitle')}</p>
+      <h2 style={{ marginBottom: 'var(--space-12)' }}>{t('title')}</h2>
 
       <div
         style={{
@@ -76,7 +78,7 @@ export default function TimelineBanner() {
                   letterSpacing: '0.06em',
                 }}
               >
-                {phase.phase}
+                {t(`phases.${phase.id}.phase`)}
               </div>
               <div
                 style={{
@@ -86,7 +88,7 @@ export default function TimelineBanner() {
                   maxWidth: '160px',
                 }}
               >
-                {phase.description}
+                {t(`phases.${phase.id}.desc`)}
               </div>
             </div>
           </div>

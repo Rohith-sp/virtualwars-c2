@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { showToast } from '@/components/Toast';
 
 export default function ShareCard() {
+  const t = useTranslations('shareCard');
+  const tCommon = useTranslations('common');
   const [name, setName] = useState('');
   const [generating, setGenerating] = useState(false);
   const cardRef = useRef(null);
@@ -27,10 +30,10 @@ export default function ShareCard() {
         a.download = 'my-voter-card.png';
         a.click();
         URL.revokeObjectURL(url);
-        showToast('Voter card downloaded successfully!', 'success');
+        showToast(t('successToast'), 'success');
       }, 'image/png');
     } catch {
-      showToast('Could not generate image. Please try again.', 'error');
+      showToast(tCommon('error'), 'error');
     } finally {
       setGenerating(false);
     }
@@ -80,7 +83,7 @@ export default function ShareCard() {
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🇮🇳</div>
             <div style={{ fontSize: '0.7rem', letterSpacing: '0.25em', color: 'var(--accent-blue)', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 600 }}>
-              Election Commission of India
+              {t('eci')}
             </div>
             <div style={{ 
               fontFamily: 'var(--font-display)', 
@@ -93,7 +96,7 @@ export default function ShareCard() {
               {displayName}
             </div>
             <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '28px', fontStyle: 'italic' }}>
-              Proud Registered Voter
+              {t('voterStatus')}
             </div>
             <div
               style={{
@@ -109,10 +112,10 @@ export default function ShareCard() {
                 textTransform: 'uppercase',
               }}
             >
-              I Will Vote
+              {t('pledge')}
             </div>
             <div style={{ marginTop: '32px', fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-              voters.eci.gov.in • 1950 Helpline
+              {t('helpline')}
             </div>
           </div>
         </div>
@@ -138,7 +141,7 @@ export default function ShareCard() {
           aria-label="Download your voter card as a PNG image"
           style={{ justifyContent: 'center' }}
         >
-          {generating ? 'Generating…' : '⬇ Download Card'}
+          {generating ? tCommon('loading') : `⬇ ${t('download')}`}
         </button>
       </div>
     </div>

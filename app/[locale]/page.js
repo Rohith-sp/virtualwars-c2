@@ -13,6 +13,8 @@ import ProblemCard from '@/components/ProblemCard';
 import EpicFormatter from '@/components/EpicFormatter';
 import BoothLocator from '@/components/BoothLocator';
 import ShareCard from '@/components/ShareCard';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslations } from 'next-intl';
 import forms from '@/data/forms.json';
 import problems from '@/data/problems.json';
 
@@ -20,6 +22,17 @@ import problems from '@/data/problems.json';
 const SimulationModal = dynamic(() => import('@/components/SimulationModal'), { ssr: false });
 
 export default function Home() {
+  const tNav = useTranslations('nav');
+  const tHero = useTranslations('hero');
+  const tFlow = useTranslations('flow');
+  const tChat = useTranslations('chat');
+  const tBooth = useTranslations('boothLocator');
+  const tShare = useTranslations('shareCard');
+  const tFooter = useTranslations('footer');
+  const tForms = useTranslations('forms');
+  const tProblems = useTranslations('problems');
+  const tEpic = useTranslations('epic');
+
   useScrollReveal();
   const [modalOpen, setModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(true);
@@ -69,15 +82,16 @@ export default function Home() {
           </a>
 
           <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
-            <a href="#guide" className="btn btn-ghost btn-sm">Guide</a>
-            <a href="#forms" className="btn btn-ghost btn-sm">Forms</a>
-            <button onClick={() => setIsChatOpen(true)} className="btn btn-ghost btn-sm">AI Chat</button>
+            <LanguageSwitcher />
+            <a href="#guide" className="btn btn-ghost btn-sm">{tNav('guide')}</a>
+            <a href="#forms" className="btn btn-ghost btn-sm">{tNav('forms')}</a>
+            <button onClick={() => setIsChatOpen(true)} className="btn btn-ghost btn-sm">{tNav('aiChat')}</button>
             <button
               className="btn btn-primary btn-sm"
               onClick={() => setModalOpen(true)}
-              aria-label="Open vote simulation"
+              aria-label={tNav('trySimulation')}
             >
-              🗳️ Try Simulation
+              {tNav('trySimulation')}
             </button>
           </div>
         </nav>
@@ -98,34 +112,34 @@ export default function Home() {
         >
           <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <div className="hero-title-border">
-              <p className="caption" style={{ fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 'var(--space-2)' }}>India&apos;s Voter Information Assistant</p>
+              <p className="caption" style={{ fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 'var(--space-2)' }}>{tHero('caption')}</p>
               <h1 id="hero-heading">
-                Know Your <span className="text-gradient">Democratic Rights</span>
+                {tHero('headline')}
               </h1>
             </div>
             <p style={{ fontSize: '1.0625rem', color: 'var(--text-secondary)', lineHeight: 1.75, maxWidth: '480px' }}>
-              Register to vote, update your details, find your polling booth, and understand every form — guided by AI, powered by the Election Commission of India.
+              {tHero('subheadline')}
             </p>
             <FactsTicker />
             <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-              <a href="#guide" className="btn btn-primary" style={{ padding: '0 var(--space-6)' }}>Start Here →</a>
+              <a href="#guide" className="btn btn-primary" style={{ padding: '0 var(--space-6)' }}>{tHero('ctaPrimary')} →</a>
               <button
                 className="btn btn-outline"
                 onClick={() => setModalOpen(true)}
-                aria-label="Practice voting in a simulation"
+                aria-label={tHero('practiceVoting')}
                 style={{ padding: '0 var(--space-6)' }}
               >
-                🗳️ Practice Voting
+                {tHero('practiceVoting')}
               </button>
             </div>
           </div>
 
           <div className="grid-2 reveal">
             {[
-              { value: '96Cr+', label: 'Registered Voters', icon: '👥' },
-              { value: '7', label: 'Forms Covered', icon: '📋' },
-              { value: '10Lac+', label: 'Polling Stations', icon: '🏛️' },
-              { value: '1950', label: 'Voter Helpline', icon: '📞' },
+              { value: '96Cr+', label: tHero('stats.voters'), icon: '👥' },
+              { value: '7', label: tHero('stats.forms'), icon: '📋' },
+              { value: '10Lac+', label: tHero('stats.stations'), icon: '🏛️' },
+              { value: '1950', label: tHero('stats.helpline'), icon: '📞' },
             ].map((stat, i) => (
               <div key={stat.label} className="card reveal" style={{ textAlign: 'center', padding: 'var(--space-6)' }}>
                 <div style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }} aria-hidden="true">{stat.icon}</div>
@@ -145,10 +159,10 @@ export default function Home() {
 
         {/* ── Flow Guide ────────────────────────────────────────────── */}
         <section id="guide" aria-labelledby="guide-heading" className="container reveal" style={{ textAlign: 'center' }}>
-          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>Step-by-Step Chatbot</p>
-          <h2 id="guide-heading" style={{ marginBottom: 'var(--space-4)' }}>Your Personalised Voter Guide</h2>
+          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>{tFlow('stepByStep')}</p>
+          <h2 id="guide-heading" style={{ marginBottom: 'var(--space-4)' }}>{tFlow('guideTitle')}</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-8)', maxWidth: '560px', margin: '0 auto' }}>
-            Answer a few questions and get tailored instructions — no searching through PDFs required.
+            {tFlow('guideSubtitle')}
           </p>
           <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'left' }}>
             <ErrorBoundary>
@@ -161,8 +175,8 @@ export default function Home() {
 
         {/* ── Form Cards ────────────────────────────────────────────── */}
         <section id="forms" aria-labelledby="forms-heading" className="container reveal">
-          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>Electoral Forms Explained</p>
-          <h2 id="forms-heading">Every Form You Need to Know</h2>
+          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>{tForms('caption')}</p>
+          <h2 id="forms-heading">{tForms('title')}</h2>
           <div className="grid-3" style={{ marginTop: 'var(--space-8)' }}>
             {forms.map((form) => (
               <FormCard key={form.id} form={form} />
@@ -174,8 +188,8 @@ export default function Home() {
 
         {/* ── Problem Cards ─────────────────────────────────────────── */}
         <section aria-labelledby="problems-heading" className="container reveal">
-          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>Common Issues</p>
-          <h2 id="problems-heading">Got a Problem? We&apos;ve Got the Fix</h2>
+          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>{tProblems('caption')}</p>
+          <h2 id="problems-heading">{tProblems('title')}</h2>
           <div className="grid-3" style={{ marginTop: 'var(--space-8)' }}>
             {problems.map((p) => (
               <ProblemCard
@@ -203,8 +217,8 @@ export default function Home() {
 
         {/* ── EPIC Formatter ────────────────────────────────────────── */}
         <section aria-labelledby="epic-heading" className="container reveal" style={{ textAlign: 'center' }}>
-          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>Voter ID Tool</p>
-          <h2 id="epic-heading" style={{ marginBottom: 'var(--space-8)' }}>Validate Your EPIC Number</h2>
+          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>{tEpic('caption')}</p>
+          <h2 id="epic-heading" style={{ marginBottom: 'var(--space-8)' }}>{tEpic('titleLabel')}</h2>
           <div style={{ maxWidth: '480px', margin: '0 auto' }}>
             <EpicFormatter />
           </div>
@@ -214,8 +228,8 @@ export default function Home() {
 
         {/* ── Booth Locator ─────────────────────────────────────────── */}
         <section aria-labelledby="booth-heading" className="container reveal" style={{ textAlign: 'center' }}>
-          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>Polling Booth</p>
-          <h2 id="booth-heading" style={{ marginBottom: 'var(--space-8)' }}>Find Your Polling Booth</h2>
+          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>{tBooth('caption')}</p>
+          <h2 id="booth-heading" style={{ marginBottom: 'var(--space-8)' }}>{tBooth('title')}</h2>
           <BoothLocator />
         </section>
 
@@ -223,10 +237,10 @@ export default function Home() {
 
         {/* ── Share Card ────────────────────────────────────────────── */}
         <section aria-labelledby="share-heading" className="container reveal" style={{ textAlign: 'center', paddingBottom: 'var(--space-16)' }}>
-          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>Spread the Word</p>
-          <h2 id="share-heading" style={{ marginBottom: 'var(--space-4)' }}>Share Your Voter Pride</h2>
+          <p className="caption" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>{tShare('caption')}</p>
+          <h2 id="share-heading" style={{ marginBottom: 'var(--space-4)' }}>{tShare('title')}</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-8)', maxWidth: '480px', margin: '0 auto' }}>
-            Download a personalised voter card and inspire others to register and vote.
+            {tShare('subtitle')}
           </p>
           <ShareCard />
         </section>
@@ -236,10 +250,10 @@ export default function Home() {
       <footer style={{ borderTop: '1px solid var(--border)', padding: 'var(--space-10) 0', textAlign: 'center', background: 'var(--bg-surface)' }}>
         <div className="container">
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            Built for democracy · Data sourced from <a href="https://eci.gov.in" target="_blank" rel="noopener noreferrer" style={{color: 'var(--accent-blue)', textDecoration: 'underline'}}>ECI</a> · Not an official government service
+            {tFooter('builtForDemocracy')} <a href="https://eci.gov.in" target="_blank" rel="noopener noreferrer" style={{color: 'var(--accent-blue)', textDecoration: 'underline'}}>ECI</a> · {tFooter('notOfficial')}
           </p>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 'var(--space-2)' }}>
-            Voter Helpline: <strong style={{ color: 'var(--text-secondary)' }}>1950</strong> · <a href="https://voters.eci.gov.in" target="_blank" rel="noopener noreferrer" style={{color: 'var(--accent-blue)', textDecoration: 'underline'}}>voters.eci.gov.in</a>
+            {tFooter('voterHelpline')} <strong style={{ color: 'var(--text-secondary)' }}>1950</strong> · <a href="https://voters.eci.gov.in" target="_blank" rel="noopener noreferrer" style={{color: 'var(--accent-blue)', textDecoration: 'underline'}}>voters.eci.gov.in</a>
           </p>
         </div>
       </footer>

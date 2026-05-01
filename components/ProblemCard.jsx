@@ -1,8 +1,16 @@
 'use client';
 
-const URGENCY_LABEL = { high: 'Urgent', medium: 'Medium', low: 'Low' };
+import { useTranslations } from 'next-intl';
 
 export default function ProblemCard({ problem, onNavigate }) {
+  const t = useTranslations('problems');
+  
+  const URGENCY_LABEL = { 
+    high: t('urgency.high'), 
+    medium: t('urgency.medium'), 
+    low: t('urgency.low') 
+  };
+
   const handleClick = () => {
     if (onNavigate && problem.formId) {
       onNavigate(problem.formId);
@@ -65,15 +73,15 @@ export default function ProblemCard({ problem, onNavigate }) {
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.05rem', marginBottom: 'var(--space-2)' }}>
-          {problem.problem}
+          {t(`data.${problem.id}.problem`)}
         </div>
         <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-          {problem.solution}
+          {t(`data.${problem.id}.solution`)}
         </div>
       </div>
 
       <div style={{ fontSize: '0.85rem', color: 'var(--accent-blue)', fontWeight: 600, marginTop: 'var(--space-2)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-        Get help <span style={{ fontSize: '1.1em' }}>→</span>
+        {t('getHelp')} <span style={{ fontSize: '1.1em' }}>→</span>
       </div>
     </div>
   );

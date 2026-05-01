@@ -1,0 +1,236 @@
+{
+  "nav": {
+    "home": "Home",
+    "howItWorks": "How It Works",
+    "timeline": "Timeline",
+    "assistant": "Ask VoteIQ",
+    "about": "About",
+    "checkVoterId": "Check Voter ID",
+    "guide": "Guide",
+    "forms": "Forms",
+    "trySimulation": "🗳️ Try Simulation",
+    "aiChat": "AI Chat"
+  },
+  "hero": {
+    "headline": "Every Vote Shapes a Nation.",
+    "subheadline": "Understand the complete Indian election process — from voter registration to result declaration.",
+    "ctaPrimary": "Explore the Process",
+    "ctaSecondary": "Ask a Question",
+    "practiceVoting": "🗳️ Practice Voting",
+    "stats": {
+      "voters": "Registered Voters",
+      "forms": "Forms Covered",
+      "stations": "Polling Stations",
+      "helpline": "Voter Helpline"
+    },
+    "caption": "India's Voter Information Assistant"
+  },
+  "flow": {
+    "back": "Back",
+    "startOver": "Start Over",
+    "stepOf": "Step {current} of {total}",
+    "stepByStep": "Step-by-Step Chatbot",
+    "guideTitle": "Your Personalised Voter Guide",
+    "guideSubtitle": "Answer a few questions and get tailored instructions — no searching through PDFs required."
+  },
+  "chat": {
+    "placeholder": "Ask anything about Indian elections...",
+    "send": "Send",
+    "thinking": "VoteIQ is thinking...",
+    "suggestedQuestions": {
+      "register": "How do I register to vote?",
+      "counting": "What happens on counting day?",
+      "mcc": "What is the Model Code of Conduct?",
+      "evm": "How does an EVM work?"
+    },
+    "errorMessage": "Something went wrong. Please try again."
+  },
+  "timeline": {
+    "title": "Election Timeline",
+    "subtitle": "Key milestones in a General Election cycle",
+    "phases": {
+      "announcement": {
+        "phase": "Announcement",
+        "desc": "Election Commission announces election dates. Model Code of Conduct kicks in immediately — government cannot announce new schemes or transfers."
+      },
+      "nominations": {
+        "phase": "Nominations",
+        "desc": "Candidates file their nomination papers. The Returning Officer scrutinises each nomination for eligibility and completeness."
+      },
+      "withdrawal": {
+        "phase": "Withdrawal",
+        "desc": "Last date for candidates to withdraw from the race. The final candidate list is published and symbols are allotted."
+      },
+      "campaign": {
+        "phase": "Campaign Period",
+        "desc": "Parties campaign actively through rallies, advertising, and canvassing. Model Code of Conduct is strictly enforced throughout."
+      },
+      "silence": {
+        "phase": "Campaign Silence",
+        "desc": "48 hours before polling, all campaigning stops. No rallies, no political ads, no social media campaigns during this period."
+      },
+      "polling": {
+        "phase": "Polling Day",
+        "desc": "Voters cast their ballots. Booths open 7 AM to 6 PM. Indelible ink marks your finger. Carry at least one approved photo ID."
+      },
+      "counting": {
+        "phase": "Vote Counting",
+        "desc": "Ballots are counted at designated counting centres under observer supervision. Results are declared and winners take oath of office."
+      }
+    }
+  },
+  "simulation": {
+    "title": "Voting Simulation",
+    "instruction": "Select your candidate and press the blue button",
+    "confirm": "Cast Vote",
+    "successTitle": "Vote Recorded!",
+    "successMessage": "Your vote has been successfully cast.",
+    "candidates": {
+      "c1": {
+        "name": "Amara Singh",
+        "party": "Progressive Party"
+      },
+      "c2": {
+        "name": "Ravi Kumar",
+        "party": "Development Alliance"
+      },
+      "c3": {
+        "name": "Priya Patel",
+        "party": "Green Future"
+      },
+      "c4": {
+        "name": "Deepak Sharma",
+        "party": "United Front"
+      },
+      "c5": {
+        "name": "Meera Nair",
+        "party": "Citizens’ Choice"
+      },
+      "nota": {
+        "name": "NOTA",
+        "party": "None Of The Above"
+      }
+    }
+  },
+  "boothLocator": {
+    "title": "Find Your Polling Booth",
+    "searchPlaceholder": "Enter your name or EPIC number",
+    "search": "Search",
+    "noResults": "No booth found. Please check your details.",
+    "loading": "Searching...",
+    "caption": "Polling Booth",
+    "pincodeLabel": "Search by Pincode",
+    "pincodeDesc": "Enter your 6-digit pincode to locate your nearest polling booth.",
+    "smsAlternative": "Alternatively, SMS {code} to {number} or call the Voter Helpline."
+  },
+  "shareCard": {
+    "title": "Share Your Voter Pride",
+    "download": "Download Card",
+    "successToast": "Card downloaded successfully!",
+    "caption": "Spread the Word",
+    "subtitle": "Download a personalised voter card and inspire others to register and vote.",
+    "eci": "Election Commission of India",
+    "voterStatus": "Proud Registered Voter",
+    "pledge": "I Will Vote",
+    "helpline": "voters.eci.gov.in • 1950 Helpline"
+  },
+  "footer": {
+    "disclaimer": "Not affiliated with ECI. Educational use only.",
+    "officialResources": "Official Resources",
+    "quickLinks": "Quick Links",
+    "builtForDemocracy": "Built for democracy · Data sourced from",
+    "notOfficial": "Not an official government service",
+    "voterHelpline": "Voter Helpline:"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "retry": "Try Again",
+    "learnMore": "Learn More",
+    "close": "Close",
+    "didYouKnow": "Did you know? "
+  },
+  "forms": {
+    "eligibleIf": "Eligible if:",
+    "documentsRequired": "Documents Required",
+    "stepByStep": "Step-by-step guide",
+    "applyOnline": "Apply Online →",
+    "caption": "Electoral Forms Explained",
+    "title": "Every Form You Need to Know",
+    "data": {
+      "form6": {
+        "title": "New Voter Registration",
+        "eligibility": "Indian citizen, 18+ years old by January 1 of the reference year",
+        "docsLabel": "Documents Required",
+        "docs": [
+          "Age Proof",
+          "Address Proof",
+          "Photo"
+        ]
+      },
+      "form7": {
+        "title": "Deletion of Voter Entry",
+        "eligibility": "Any citizen can file on behalf of a deceased or relocated voter"
+      },
+      "form8": {
+        "title": "Correction in Voter Details",
+        "eligibility": "Any registered voter who needs to update their electoral entry"
+      },
+      "form8a": {
+        "title": "Transposition Within Constituency",
+        "eligibility": "Voters who have moved to a new address within the same Assembly constituency"
+      }
+    }
+  },
+  "epic": {
+    "title": "Verify Your Voter ID Number",
+    "placeholder": "e.g. ABC1234567",
+    "validFormat": "✓ Valid EPIC format (3 letters + 7 digits)",
+    "invalidFormat": "Format: 3 capital letters followed by 7 digits",
+    "copy": "Copy",
+    "copied": "✓ Copied",
+    "description": "Your EPIC number is printed on your Voter ID card. It has 3 capital letters followed by 7 digits.",
+    "caption": "Voter ID Tool",
+    "titleLabel": "Validate Your EPIC Number"
+  },
+  "problems": {
+    "getHelp": "Get Help",
+    "urgency": {
+      "high": "Urgent",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "caption": "Common Issues",
+    "title": "Got a Problem? We've Got the Fix",
+    "data": {
+      "name_mismatch": {
+        "problem": "Name on voter card doesn't match Aadhaar",
+        "solution": "File Form 8 for name correction. Upload your Aadhaar as proof of the correct name."
+      },
+      "not_in_list": {
+        "problem": "My name is missing from the electoral roll",
+        "solution": "Search at voters.eci.gov.in to confirm. If genuinely missing, file Form 6 immediately."
+      },
+      "wrong_photo": {
+        "problem": "My voter ID has a very old or blurry photo",
+        "solution": "File Form 8 for photo correction. Bring a new recent passport-size photograph."
+      },
+      "double_entry": {
+        "problem": "I'm registered in two different constituencies",
+        "solution": "File Form 7 to delete one entry. By law, you can only be registered in one constituency."
+      },
+      "wrong_address": {
+        "problem": "Voter ID shows my old address after moving",
+        "solution": "If within the same constituency, use Form 8A (transposition — fastest option)."
+      },
+      "damaged_epic": {
+        "problem": "My Voter ID card is damaged or torn",
+        "solution": "Apply for a duplicate EPIC at voters.eci.gov.in. Pay the Rs 25 fee."
+      }
+    }
+  },
+  "metadata": {
+    "title": "VoteGuide India — Your Complete Voter Information Assistant",
+    "description": "Understand voter registration (Form 6), corrections (Form 8), and how to vote in India."
+  }
+}

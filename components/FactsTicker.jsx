@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import facts from '@/data/facts.json';
 
 const INTERVAL_MS = 6000;
 
 export default function FactsTicker() {
+  const t = useTranslations('common');
   const indexRef = useRef(0);
   const fadeTimerRef = useRef(null);
   const [fact, setFact] = useState(facts[0]);
@@ -53,7 +55,7 @@ export default function FactsTicker() {
           margin: 0,
         }}
       >
-        <strong style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>Did you know? </strong>
+        <strong style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>{t('didYouKnow')}</strong>
         {fact}
       </p>
     </div>

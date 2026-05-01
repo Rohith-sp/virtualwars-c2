@@ -86,7 +86,7 @@ export async function POST(request) {
     );
   }
 
-  const { question } = body ?? {};
+  const { question, locale = 'en' } = body ?? {};
 
   if (typeof question !== 'string' || question.trim().length === 0) {
     return Response.json(
@@ -109,8 +109,19 @@ export async function POST(request) {
   // ── Call Gemini API (server-side only — key never sent to client) ──────────
   const apiKey = process.env.GEMINI_API_KEY;
 
+  const LANGUAGE_NAMES = {
+    en: 'English', hi: 'Hindi', bn: 'Bengali', te: 'Telugu',
+    ta: 'Tamil', mr: 'Marathi', gu: 'Gujarati', kn: 'Kannada', pa: 'Punjabi'
+  };
+  const langName = LANGUAGE_NAMES[locale] || 'English';
+
   const SYSTEM_INSTRUCTION =
-    'You are a concise Indian election guide. Answer ONLY questions about voter registration, EPIC cards, Forms 6/7/8/8A, voting procedures, EVMs, NOTA, and ECI rules. Keep answers under 120 words and in plain prose — no markdown. If the question is unrelated to Indian elections, politely say you can only help with election topics.';
+    `You are VoteIQ, a civic education assistant for Indian elections.
+IMPORTANT: Always respond in ${langName} only, regardless of what language the user writes in. If the user writes in a different language, still reply in ${langName}.
+Keep answers factual, under 150 words unless detail is requested.
+Cite the Election Commission of India as the authoritative source.
+Never give partisan opinions.
+Answer ONLY questions about voter registration, EPIC cards, Forms 6/7/8/8A, voting procedures, EVMs, NOTA, and ECI rules. If the question is unrelated to Indian elections, politely say you can only help with election topics.`;
 
   try {
     const geminiRes = await fetch(
