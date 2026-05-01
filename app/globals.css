@@ -8,32 +8,32 @@
    ───────────────────────────────────────────── */
 :root {
   /* Background layers */
-  --bg-base: #070d1a;
-  --bg-surface: #0f1b35;
-  --bg-surface-2: #162347;
-  --bg-glass: rgba(15, 27, 53, 0.72);
+  --bg-base: #060c18;
+  --bg-surface: #060c18;
+  --bg-surface-2: #060c18;
+  --bg-glass: rgba(6, 12, 24, 0.85);
 
-  /* Brand – saffron / India flag */
-  --color-primary: #ff6b35;
-  --color-primary-light: #ff8c5a;
-  --color-primary-dim: rgba(255, 107, 53, 0.14);
-  --color-primary-text: #1a0800; /* dark text ON saffron bg — contrast 7.2:1 */
+  /* Brand – Saffron accent used sparingly */
+  --color-primary: #FF9933;
+  --color-primary-light: #ffac5e;
+  --color-primary-dim: rgba(255, 153, 51, 0.1);
+  --color-primary-text: #060c18;
 
-  /* Accents */
-  --color-secondary: #0ea5e9;
-  --color-success: #22c55e;
-  --color-warning: #fbbf24;
+  /* Accents – Cool Steel Blue */
+  --color-secondary: #4A90D9;
+  --color-success: #4A90D9; /* Unified for Constitutional look */
+  --color-warning: #FF9933;
   --color-danger: #ef4444;
-  --color-purple: #8b5cf6;
+  --color-purple: #4A90D9;
 
-  /* Text — all ≥ 4.5:1 on --bg-base */
-  --text-primary: #f0f4ff;   /* contrast 16:1 on --bg-base ✓ */
-  --text-secondary: #a8b8d8; /* contrast  7:1 on --bg-base ✓ */
-  --text-muted: #6b7fa3;     /* used only for large/decorative text  */
+  /* Text */
+  --text-primary: #f0f4ff;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
 
   /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-glow: rgba(255, 107, 53, 0.35);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(74, 144, 217, 0.3);
 
   /* Typography */
   --font-display: var(--font-playfair), Georgia, serif;
@@ -92,8 +92,6 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  /* Subtle noise grain overlay */
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
 /* ── Typography ─────────────────────────────── */
@@ -138,11 +136,11 @@ a:hover { color: var(--color-primary-light); }
 /* ── Glass Card ─────────────────────────────── */
 .card-glass {
   background: var(--bg-glass);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  box-shadow: none; /* One level only, clean geometry */
 }
 
 /* ── Buttons ────────────────────────────────── */

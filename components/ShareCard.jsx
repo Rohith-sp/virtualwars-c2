@@ -51,24 +51,20 @@ export default function ShareCard() {
         style={{
           width: '360px',
           padding: '48px 32px',
-          background: 'linear-gradient(135deg, #070d1a 0%, #0f1b35 100%)',
-          border: '1px solid rgba(255,107,53,0.3)',
+          background: '#060c18', /* Solid navy base */
+          border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: '24px',
           textAlign: 'center',
           fontFamily: 'var(--font-body)',
           userSelect: 'none',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.45)', /* simple clean shadow */
           position: 'relative',
           overflow: 'hidden'
         }}
         aria-hidden="true"
       >
-        {/* Decorative Indian Flag Glows */}
-        <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '150px', height: '150px', background: 'rgba(255,153,51,0.3)', filter: 'blur(50px)', borderRadius: '50%' }} />
-        <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '150px', height: '150px', background: 'rgba(19,136,8,0.25)', filter: 'blur(50px)', borderRadius: '50%' }} />
-        
-        {/* Top Flag Line */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%)' }} />
+        {/* Top Accent Line */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: '#ffffff' }} />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🇮🇳</div>
@@ -85,7 +81,7 @@ export default function ShareCard() {
           }}>
             {displayName}
           </div>
-          <div style={{ fontSize: '0.9rem', color: '#ff8c5a', marginBottom: '28px', fontStyle: 'italic' }}>
+          <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '28px', fontStyle: 'italic' }}>
             Proud Registered Voter
           </div>
           <div
