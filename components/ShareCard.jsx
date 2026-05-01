@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import html2canvas from 'html2canvas';
 
 // html2canvas captures a styled <div> — avoids raw canvas toBlob() privacy blocks
 // on static hosts (Firebase, Vercel) that can silently return blank PNGs.
@@ -17,6 +16,7 @@ export default function ShareCard() {
     setGenerating(true);
     setShareError('');
     try {
+      const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: '#0f1b35',
         scale: 2,           // retina quality

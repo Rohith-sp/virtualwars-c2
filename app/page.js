@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import FlowChat from '@/components/FlowChat';
 import ChatWindow from '@/components/ChatWindow';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import FactsTicker from '@/components/FactsTicker';
 import TimelineBanner from '@/components/TimelineBanner';
 import FormCard from '@/components/FormCard';
@@ -157,7 +158,9 @@ export default function Home() {
             Answer a few questions and get tailored instructions — no searching through PDFs required.
           </p>
           <div style={{ maxWidth: '680px' }}>
-            <FlowChat />
+            <ErrorBoundary>
+              <FlowChat />
+            </ErrorBoundary>
           </div>
         </section>
 
@@ -301,7 +304,9 @@ export default function Home() {
       </footer>
 
       {/* ── Simulation Modal (dynamically imported, ssr:false) ────────── */}
-      <SimulationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <ErrorBoundary>
+        <SimulationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      </ErrorBoundary>
     </>
   );
 }

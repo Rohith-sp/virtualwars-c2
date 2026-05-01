@@ -5,8 +5,9 @@ import flows from '@/data/flows.json';
 import { buildIndex, getNode, getOptions, isTerminal } from '@/lib/flowEngine';
 import { trackEvent, GA_EVENTS } from '@/lib/analytics';
 
-export default function FlowChat({ initialNodeId = 'root', onFormNavigate }) {
-  // Build index once on mount — O(1) lookups from here on
+export default function FlowChat({ initialNodeId = 'root' }) {
+  // Build index once on mount — O(1) lookups from here on.
+  // intentionally omitted initialNodeId from deps — re-indexing on node change is not desired.
   const flowIndex = useMemo(() => {
     trackEvent(GA_EVENTS.FLOW_STARTED, { node_id: initialNodeId });
     return buildIndex(flows);

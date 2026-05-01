@@ -19,6 +19,32 @@ export const metadata = {
   title: 'VoteGuide India — Your Complete Voter Information Assistant',
   description:
     'Understand voter registration (Form 6), corrections (Form 8), deletions (Form 7), transpositions (Form 8A), and how to vote in India. Powered by AI and the Election Commission of India.',
+  keywords: 'India elections, Voter registration, Form 6, EPIC card, Polling booth, ECI, Election Commission of India, Voting guide',
+  authors: [{ name: 'VoteGuide India Team' }],
+  openGraph: {
+    title: 'VoteGuide India — Empowering Every Voter',
+    description: 'AI-powered guide to Indian elections. Register, find your booth, and know your rights.',
+    url: 'https://voteguide.in', // Placeholder
+    siteName: 'VoteGuide India',
+    images: [
+      {
+        url: '/og-image.png', // Placeholder
+        width: 1200,
+        height: 630,
+        alt: 'VoteGuide India Dashboard',
+      },
+    ],
+    locale: 'en_IN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'VoteGuide India — Empowering Every Voter',
+    description: 'AI-powered guide to Indian elections. Register, find your booth, and know your rights.',
+    images: ['/og-image.png'],
+  },
+  viewport: 'width=device-width, initial-scale=1',
+  robots: 'index, follow',
 };
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;

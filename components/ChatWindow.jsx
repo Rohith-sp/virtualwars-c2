@@ -3,8 +3,6 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { trackEvent, GA_EVENTS } from '@/lib/analytics';
 
-const SYSTEM_PROMPT =
-  'You are a concise Indian election guide. Answer only election-related questions about voter registration, EPIC cards, Forms 6/7/8/8A, voting procedures, EVM, NOTA, and ECI rules. Keep answers under 120 words. If asked anything unrelated, politely decline.';
 
 function sanitize(str) {
   return String(str).trim().slice(0, 500);
@@ -53,6 +51,11 @@ export default function ChatWindow() {
 
         if (res.status === 429) {
           setError('Rate limit reached. Please wait a minute before asking again.');
+          setLoading(false);
+          return;
+        }
+        if (res.status === 504) {
+          setError('The AI is taking too long right now. Please try again in a moment.');
           setLoading(false);
           return;
         }

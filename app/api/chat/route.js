@@ -1,63 +1,113 @@
-import { headers } from 'next/headers';
+import * as Sentry from '@sentry/nextjs';
+import { ratelimit } from '@/lib/rateLimiter';
 
-// ── In-memory rate limiter ────────────────────────────────────────────────
-// Intentionally simplified for hackathon demo (resets on cold start).
-// Production alternative: Redis / Upstash with atomic INCR + EXPIRE.
-const rateLimitMap = new Map(); // ip -> { count: number, resetAt: number }
-const RATE_LIMIT = 10;
-const WINDOW_MS = 60_000;
+// ── Gemini request timeout ────────────────────────────────────────────────────
+const GEMINI_TIMEOUT_MS = 8000;
 
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip) ?? { count: 0, resetAt: now + WINDOW_MS };
-  if (now > entry.resetAt) {
-    entry.count = 0;
-    entry.resetAt = now + WINDOW_MS;
+// ── Startup / build-time environment validation ───────────────────────────────
+// Throws at module-load time so a misconfigured deployment fails fast rather
+// than surfacing as a 503 to the first real user.
+const REQUIRED_ENV_VARS = [
+  'GEMINI_API_KEY',
+  'UPSTASH_REDIS_REST_URL',
+  'UPSTASH_REDIS_REST_TOKEN',
+];
+for (const key of REQUIRED_ENV_VARS) {
+  if (!process.env[key]) {
+    throw new Error(
+      `[VoteGuide] Missing required environment variable: ${key}.\n` +
+        `Set it in .env.local for development or in your deployment environment for production.`,
+    );
   }
-  entry.count += 1;
-  rateLimitMap.set(ip, entry);
-  return entry.count <= RATE_LIMIT;
 }
 
-// ── Route handler ─────────────────────────────────────────────────────────
-export async function POST(request) {
-  // Get client IP from forwarded header (works on Vercel / behind proxy)
-  const headersList = headers();
-  const forwarded = headersList.get('x-forwarded-for');
-  const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
+// ── CORS helpers ──────────────────────────────────────────────────────────────
+function getAllowedOrigins() {
+  return (process.env.ALLOWED_ORIGINS ?? process.env.ALLOWED_ORIGIN ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
-  if (!checkRateLimit(ip)) {
+function buildCorsHeaders(origin) {
+  return { 'Access-Control-Allow-Origin': origin };
+}
+
+// ── Preflight handler ─────────────────────────────────────────────────────────
+export async function OPTIONS(request) {
+  const origin = request.headers.get('origin') ?? '';
+  const allowedOrigins = getAllowedOrigins();
+
+  if (origin && !allowedOrigins.includes(origin)) {
+    return new Response(null, { status: 403 });
+  }
+
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+}
+
+// ── Route handler ─────────────────────────────────────────────────────────────
+export async function POST(request) {
+  // ── CORS check ────────────────────────────────────────────────────────────
+  const origin = request.headers.get('origin') ?? '';
+  const allowedOrigins = getAllowedOrigins();
+  // Same-origin requests have no Origin header — always allow.
+  if (origin && !allowedOrigins.includes(origin)) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  const corsHeaders = origin ? buildCorsHeaders(origin) : {};
+
+  // ── Rate limiting (Upstash Redis, sliding window) ─────────────────────────
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
+  const { success } = await ratelimit.limit(ip);
+  if (!success) {
     return Response.json(
-      { error: 'Rate limit exceeded. Max 10 requests per minute.' },
-      { status: 429 },
+      { error: 'Too many requests. Please wait.' },
+      { status: 429, headers: corsHeaders },
     );
   }
 
-  // ── Validate request body ────────────────────────────────────────────────
+  // ── Validate request body ─────────────────────────────────────────────────
   let body;
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: 'Invalid JSON body.' }, { status: 400 });
+    return Response.json(
+      { error: 'Invalid JSON body.' },
+      { status: 400, headers: corsHeaders },
+    );
   }
 
   const { question } = body ?? {};
 
   if (typeof question !== 'string' || question.trim().length === 0) {
-    return Response.json({ error: 'Field "question" is required.' }, { status: 400 });
+    return Response.json(
+      { error: 'Field "question" is required.' },
+      { status: 400, headers: corsHeaders },
+    );
   }
   if (question.length > 500) {
-    return Response.json({ error: 'Question exceeds 500-character limit.' }, { status: 400 });
+    return Response.json(
+      { error: 'Question exceeds 500-character limit.' },
+      { status: 400, headers: corsHeaders },
+    );
   }
 
   // Sanitise: strip null bytes, control characters
-  const safeQuestion = question.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '').trim();
+  const safeQuestion = question
+    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '')
+    .trim();
 
-  // ── Call Gemini API (server-side only — key never sent to client) ─────────
+  // ── Call Gemini API (server-side only — key never sent to client) ──────────
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return Response.json({ error: 'AI service not configured.' }, { status: 503 });
-  }
 
   const SYSTEM_INSTRUCTION =
     'You are a concise Indian election guide. Answer ONLY questions about voter registration, EPIC cards, Forms 6/7/8/8A, voting procedures, EVMs, NOTA, and ECI rules. Keep answers under 120 words and in plain prose — no markdown. If the question is unrelated to Indian elections, politely say you can only help with election topics.';
@@ -68,6 +118,7 @@ export async function POST(request) {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
         body: JSON.stringify({
           system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
           contents: [{ parts: [{ text: safeQuestion }] }],
@@ -79,7 +130,10 @@ export async function POST(request) {
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error('Gemini API error:', errText);
-      return Response.json({ error: 'AI service error. Please try again.' }, { status: 502 });
+      return Response.json(
+        { error: 'AI service error. Please try again.' },
+        { status: 502, headers: corsHeaders },
+      );
     }
 
     const data = await geminiRes.json();
@@ -87,9 +141,23 @@ export async function POST(request) {
       data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ??
       'Sorry, I could not generate an answer. Please try again.';
 
-    return Response.json({ answer });
-  } catch (err) {
-    console.error('Fetch error:', err);
-    return Response.json({ error: 'Network error reaching AI service.' }, { status: 502 });
+    return Response.json({ answer }, { status: 200, headers: corsHeaders });
+  } catch (error) {
+    // ── Timeout handling ────────────────────────────────────────────────────
+    if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+      console.error('Gemini API timeout after 8s');
+      return Response.json(
+        { error: 'The AI service is taking too long. Please try again.' },
+        { status: 504, headers: corsHeaders },
+      );
+    }
+
+    // ── Generic network / unexpected error ──────────────────────────────────
+    console.error('Fetch error:', error);
+    Sentry.captureException(error, { extra: { question: safeQuestion } });
+    return Response.json(
+      { error: 'Network error reaching AI service.' },
+      { status: 502, headers: corsHeaders },
+    );
   }
 }

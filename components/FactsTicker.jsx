@@ -7,19 +7,23 @@ const INTERVAL_MS = 6000;
 
 export default function FactsTicker() {
   const indexRef = useRef(0);
+  const fadeTimerRef = useRef(null);
   const [fact, setFact] = useState(facts[0]);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setVisible(false);
-      setTimeout(() => {
+      fadeTimerRef.current = setTimeout(() => {
         indexRef.current = (indexRef.current + 1) % facts.length;
         setFact(facts[indexRef.current]);
         setVisible(true);
       }, 300);
     }, INTERVAL_MS);
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      clearTimeout(fadeTimerRef.current);
+    };
   }, []);
 
   return (
