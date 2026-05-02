@@ -24,6 +24,7 @@
     "@sentry/nextjs": "^10.51.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.37.0",
+    "firebase": "^12.12.1",
     "html2canvas": "^1.4.1",
     "leaflet": "^1.9.4",
     "lodash.merge": "^4.6.2",

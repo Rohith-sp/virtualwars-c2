@@ -1,6 +1,7 @@
 import Script from 'next/script';
 import SkipLink from '@/components/SkipLink';
 import Toast from '@/components/Toast';
+import FirebaseAnalyticsProvider from '@/components/FirebaseAnalyticsProvider';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 
@@ -46,6 +47,7 @@ export default async function LocaleLayout({ children, params: { locale } }) {
       <NextIntlClientProvider messages={messages}>
         <SkipLink />
         <Toast />
+        <FirebaseAnalyticsProvider />
         {children}
       </NextIntlClientProvider>
 
