@@ -216,10 +216,10 @@ export default function SimulationModal({ isOpen, onClose }) {
                 color: 'var(--text-secondary)',
               }}
             >
-              You voted for: <strong style={{ color: 'var(--text-primary)', display: 'block', fontSize: '1.1rem', marginTop: 'var(--space-1)' }}>{candidate?.symbol} {t(`candidates.${candidate?.id}.name`)}</strong>
+              {t('votedFor')} <strong style={{ color: 'var(--text-primary)', display: 'block', fontSize: '1.1rem', marginTop: 'var(--space-1)' }}>{candidate?.symbol} {t(`candidates.${candidate?.id}.name`)}</strong>
             </div>
-            <button className="btn btn-primary" onClick={onClose} aria-label="Close simulation and return to guide" style={{ width: '100%' }}>
-              Back to Guide
+            <button className="btn btn-primary" onClick={onClose} aria-label={t('backToGuide')} style={{ width: '100%' }}>
+              {t('backToGuide')}
             </button>
           </div>
         )}

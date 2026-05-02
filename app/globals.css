@@ -156,13 +156,13 @@ a:hover { color: var(--accent-saffron); }
 .input:focus { outline: none; border-color: var(--border-focus); box-shadow: var(--shadow-sm); background: var(--bg-surface); }
 
 /* Grids */
-.grid-1 { display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
-.grid-2 { display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
+.grid-1 { display: grid; grid-template-columns: 1fr; gap: var(--space-6); align-items: start; }
+.grid-2 { display: grid; grid-template-columns: 1fr; gap: var(--space-6); align-items: start; }
 @media (min-width: 481px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
-.grid-3 { display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
+.grid-3 { display: grid; grid-template-columns: 1fr; gap: var(--space-6); align-items: start; }
 @media (min-width: 481px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1025px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
-.grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); align-items: start; }
 @media (min-width: 1025px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
 
 /* Utilities */

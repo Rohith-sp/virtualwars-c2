@@ -31,7 +31,7 @@ export default function ProblemCard({ problem, onNavigate }) {
       className="card"
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      aria-label={`${problem.problem} — click to get help`}
+      aria-label={`${t(`data.${problem.id}.problem`)} — ${t('getHelp')}`}
       style={{
         display: 'flex',
         flexDirection: 'column',

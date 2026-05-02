@@ -54,7 +54,7 @@ export default function FormCard({ form }) {
           {t('documentsRequired')}
         </div>
         <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {form.documents.map((doc, i) => (
+          {t.raw(`data.${form.id}.docs`).map((doc, i) => (
             <li key={i} style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', gap: '8px' }}>
               <span style={{ color, flexShrink: 0 }}>•</span>
               {doc}
@@ -87,7 +87,7 @@ export default function FormCard({ form }) {
               gap: 'var(--space-2)',
             }}
           >
-            {form.steps.map((step, i) => (
+            {t.raw(`data.${form.id}.steps`).map((step, i) => (
               <li key={i} style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 {step}
               </li>

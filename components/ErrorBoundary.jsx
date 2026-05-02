@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
-class ErrorBoundary extends React.Component {
+class ErrorBoundaryInternal extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false };
@@ -18,6 +19,7 @@ class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
+      const { t } = this.props;
       return (
         <div
           style={{
@@ -34,12 +36,12 @@ class ErrorBoundary extends React.Component {
             borderRadius: 'var(--radius-md)',
           }}
         >
-          <p style={{ color: 'var(--accent-red)', fontSize: '1rem', fontWeight: 500 }}>⚠️ This section couldn't load.</p>
+          <p style={{ color: 'var(--accent-red)', fontSize: '1rem', fontWeight: 500 }}>⚠️ {t('errorSection')}</p>
           <button
             className="btn btn-outline"
             onClick={() => this.setState({ hasError: false })}
           >
-            Retry
+            {t('retry')}
           </button>
         </div>
       );
@@ -49,4 +51,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export default ErrorBoundary;
+export default function ErrorBoundary({ children }) {
+  const t = useTranslations('common');
+  return <ErrorBoundaryInternal t={t}>{children}</ErrorBoundaryInternal>;
+}

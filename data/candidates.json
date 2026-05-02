@@ -1,0 +1,72 @@
+[
+  {
+    "id": "c1",
+    "constituency": "New Delhi",
+    "name": "Rajesh Kumar",
+    "party": "Indian National Congress",
+    "education": "Post Graduate",
+    "assets": "₹ 5.2 Crores",
+    "criminalCases": 0,
+    "age": 45
+  },
+  {
+    "id": "c2",
+    "constituency": "New Delhi",
+    "name": "Arvind Sharma",
+    "party": "Bharatiya Janata Party",
+    "education": "Graduate Professional",
+    "assets": "₹ 12.8 Crores",
+    "criminalCases": 1,
+    "age": 52
+  },
+  {
+    "id": "c3",
+    "constituency": "New Delhi",
+    "name": "Meera Das",
+    "party": "Aam Aadmi Party",
+    "education": "Doctorate",
+    "assets": "₹ 1.5 Crores",
+    "criminalCases": 0,
+    "age": 39
+  },
+  {
+    "id": "c4",
+    "constituency": "Mumbai South",
+    "name": "Vikram Desai",
+    "party": "Shiv Sena",
+    "education": "Graduate",
+    "assets": "₹ 25.4 Crores",
+    "criminalCases": 3,
+    "age": 58
+  },
+  {
+    "id": "c5",
+    "constituency": "Mumbai South",
+    "name": "Priya Patel",
+    "party": "Independent",
+    "education": "Post Graduate",
+    "assets": "₹ 3.1 Crores",
+    "criminalCases": 0,
+    "age": 41
+  },
+  {
+    "id": "c6",
+    "constituency": "Bangalore South",
+    "name": "Siddharth Rao",
+    "party": "Bharatiya Janata Party",
+    "education": "Graduate Professional",
+    "assets": "₹ 8.5 Crores",
+    "criminalCases": 0,
+    "age": 35
+  },
+  {
+    "id": "c7",
+    "constituency": "Bangalore South",
+    "name": "Ananya Reddy",
+    "party": "Indian National Congress",
+    "education": "Post Graduate",
+    "assets": "₹ 15.2 Crores",
+    "criminalCases": 1,
+    "age": 48
+  }
+]

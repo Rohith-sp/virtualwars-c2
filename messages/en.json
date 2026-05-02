@@ -1,15 +1,24 @@
 {
   "nav": {
     "home": "Home",
-    "howItWorks": "How It Works",
-    "timeline": "Timeline",
-    "assistant": "Ask VoteIQ",
-    "about": "About",
-    "checkVoterId": "Check Voter ID",
     "guide": "Guide",
     "forms": "Forms",
-    "trySimulation": "🗳️ Try Simulation",
-    "aiChat": "AI Chat"
+    "timeline": "Timeline",
+    "candidates": "Candidates",
+    "manifesto": "Manifesto",
+    "mythbuster": "Myth-Buster",
+    "booth": "Booth Locator",
+    "share": "Voter Card",
+    "trySimulation": "Voting Simulation",
+    "simulate": "Simulate",
+    "aiChat": "AI Chat",
+    "sections": "Sections",
+    "tools": "Tools",
+    "current": "Current",
+    "howItWorks": "How It Works",
+    "assistant": "Ask VoteIQ",
+    "about": "About",
+    "checkVoterId": "Check Voter ID"
   },
   "hero": {
     "headline": "Every Vote Shapes a Nation.",
@@ -19,9 +28,13 @@
     "practiceVoting": "🗳️ Practice Voting",
     "stats": {
       "voters": "Registered Voters",
+      "votersVal": "96Cr+",
       "forms": "Forms Covered",
+      "formsVal": "7",
       "stations": "Polling Stations",
-      "helpline": "Voter Helpline"
+      "stationsVal": "10Lac+",
+      "helpline": "Voter Helpline",
+      "helplineVal": "1950"
     },
     "caption": "India's Voter Information Assistant"
   },
@@ -34,6 +47,8 @@
     "guideSubtitle": "Answer a few questions and get tailored instructions — no searching through PDFs required."
   },
   "chat": {
+    "title": "AI Election Assistant",
+    "welcome": "Hi! Ask me anything about voting in India — registration, lost ID, NOTA, or election day rules.",
     "placeholder": "Ask anything about Indian elections...",
     "send": "Send",
     "thinking": "VoteIQ is thinking...",
@@ -43,7 +58,11 @@
       "mcc": "What is the Model Code of Conduct?",
       "evm": "How does an EVM work?"
     },
-    "errorMessage": "Something went wrong. Please try again."
+    "errorMessage": "Something went wrong. Please try again.",
+    "rateLimit": "Rate limit reached. Please wait a minute before asking again.",
+    "timeout": "The AI is taking too long right now. Please try again in a moment.",
+    "networkError": "Network error. Please check your connection.",
+    "charsLeft": "{count} characters left"
   },
   "timeline": {
     "title": "Election Timeline",
@@ -85,6 +104,8 @@
     "confirm": "Cast Vote",
     "successTitle": "Vote Recorded!",
     "successMessage": "Your vote has been successfully cast.",
+    "votedFor": "You voted for:",
+    "backToGuide": "Back to Guide",
     "candidates": {
       "c1": {
         "name": "Amara Singh",
@@ -121,7 +142,9 @@
     "caption": "Polling Booth",
     "pincodeLabel": "Search by Pincode",
     "pincodeDesc": "Enter your 6-digit pincode to locate your nearest polling booth.",
-    "smsAlternative": "Alternatively, SMS {code} to {number} or call the Voter Helpline."
+    "smsAlternative": "Alternatively, SMS {code} to {number} or call the Voter Helpline.",
+    "nearestBooth": "Nearest Polling Booth",
+    "primarySchool": "Primary School"
   },
   "shareCard": {
     "title": "Share Your Voter Pride",
@@ -132,7 +155,11 @@
     "eci": "Election Commission of India",
     "voterStatus": "Proud Registered Voter",
     "pledge": "I Will Vote",
-    "helpline": "voters.eci.gov.in • 1950 Helpline"
+    "helpline": "voters.eci.gov.in • 1950 Helpline",
+    "namePlaceholder": "Enter your name (optional)",
+    "nameAria": "Your name for the voter card",
+    "downloadAria": "Download your voter card as a PNG image",
+    "defaultName": "Your Name"
   },
   "footer": {
     "disclaimer": "Not affiliated with ECI. Educational use only.",
@@ -148,7 +175,10 @@
     "retry": "Try Again",
     "learnMore": "Learn More",
     "close": "Close",
-    "didYouKnow": "Did you know? "
+    "didYouKnow": "Did you know? ",
+    "errorSection": "This section couldn't load.",
+    "skipToMain": "Skip to main content",
+    "dismiss": "Dismiss notification"
   },
   "forms": {
     "eligibleIf": "Eligible if:",
@@ -161,24 +191,69 @@
       "form6": {
         "title": "New Voter Registration",
         "eligibility": "Indian citizen, 18+ years old by January 1 of the reference year",
-        "docsLabel": "Documents Required",
         "docs": [
-          "Age Proof",
-          "Address Proof",
-          "Photo"
+          "Age Proof — Aadhaar, Birth Certificate, or School Certificate",
+          "Address Proof — Aadhaar, Utility Bill, or Bank Passbook",
+          "Recent passport-size photograph"
+        ],
+        "steps": [
+          "Visit voters.eci.gov.in and click 'New Registration'",
+          "Select Form 6 and fill in your personal details carefully",
+          "Upload your age proof, address proof, and photo",
+          "Submit and save your Application Reference Number",
+          "A Booth Level Officer may visit for doorstep verification",
+          "Your EPIC card will be dispatched by post after approval"
         ]
       },
       "form7": {
         "title": "Deletion of Voter Entry",
-        "eligibility": "Any citizen can file on behalf of a deceased or relocated voter"
+        "eligibility": "Any citizen can file on behalf of a deceased or relocated voter",
+        "docs": [
+          "Death certificate for deceased voter (municipal or hospital)",
+          "Proof of permanent relocation (utility bill, Aadhaar at new address)",
+          "Supporting evidence for bogus or duplicate entries"
+        ],
+        "steps": [
+          "Download Form 7 from voters.eci.gov.in",
+          "Fill in the voter's full details and reason for deletion",
+          "Attach the required supporting documents",
+          "Submit to your local Electoral Registration Officer (ERO) or online",
+          "The ERO will investigate and verify the claim",
+          "Confirmation sent after the entry is removed from rolls"
+        ]
       },
       "form8": {
         "title": "Correction in Voter Details",
-        "eligibility": "Any registered voter who needs to update their electoral entry"
+        "eligibility": "Any registered voter who needs to update their electoral entry",
+        "docs": [
+          "Proof of correct detail — Aadhaar, PAN card, or Birth Certificate",
+          "Recent photograph (for photo correction)",
+          "New address proof (for address correction)"
+        ],
+        "steps": [
+          "Visit voters.eci.gov.in and log in with your registered mobile",
+          "Select Form 8 and choose the field that needs correction",
+          "Upload documentary proof of the correct information",
+          "Submit and note your Application Reference Number",
+          "Verification may include a Booth Level Officer home visit",
+          "Updated EPIC card issued within the processing timeframe"
+        ]
       },
       "form8a": {
         "title": "Transposition Within Constituency",
-        "eligibility": "Voters who have moved to a new address within the same Assembly constituency"
+        "eligibility": "Voters who have moved to a new address within the same Assembly constituency",
+        "docs": [
+          "New address proof within same constituency — Aadhaar or Utility Bill",
+          "Your current EPIC card number"
+        ],
+        "steps": [
+          "Confirm your new address is in the same Assembly constituency",
+          "Visit voters.eci.gov.in and select Form 8A",
+          "Enter your EPIC number and new address details",
+          "Upload your new address proof",
+          "Submit — your entry moves to the correct polling station",
+          "No new EPIC card issued; same card number at new polling location"
+        ]
       }
     }
   },
@@ -191,7 +266,25 @@
     "copied": "✓ Copied",
     "description": "Your EPIC number is printed on your Voter ID card. It has 3 capital letters followed by 7 digits.",
     "caption": "Voter ID Tool",
-    "titleLabel": "Validate Your EPIC Number"
+    "titleLabel": "Validate Your EPIC Number",
+    "copyAria": "Copy EPIC number to clipboard"
+  },
+  "searchCandidates": {
+    "caption": "Know Your Candidates",
+    "title": "Candidate Background Check",
+    "description": "Search by constituency to see real details of candidates from the 2024 elections.",
+    "placeholder": "e.g. New Delhi, Mumbai South...",
+    "searchButton": "Search",
+    "noResults": "No candidates found. Try a major constituency name.",
+    "labels": {
+      "education": "Education",
+      "assets": "Total Assets",
+      "criminal": "Criminal Cases",
+      "years": "yrs",
+      "noCases": "No Cases Reported",
+      "casesCount": "{count} Case(s)",
+      "verifiedProfile": "Verified Profile"
+    }
   },
   "problems": {
     "getHelp": "Get Help",
@@ -205,32 +298,74 @@
     "data": {
       "name_mismatch": {
         "problem": "Name on voter card doesn't match Aadhaar",
-        "solution": "File Form 8 for name correction. Upload your Aadhaar as proof of the correct name."
+        "solution": "File Form 8 for name correction. Upload your Aadhaar as proof of the correct name. Processing takes 15–30 days."
       },
       "not_in_list": {
         "problem": "My name is missing from the electoral roll",
-        "solution": "Search at voters.eci.gov.in to confirm. If genuinely missing, file Form 6 immediately."
+        "solution": "Search at voters.eci.gov.in to confirm. If genuinely missing, file Form 6 immediately. On election day, approach the ERO for a Tender Vote."
       },
       "wrong_photo": {
         "problem": "My voter ID has a very old or blurry photo",
-        "solution": "File Form 8 for photo correction. Bring a new recent passport-size photograph."
+        "solution": "File Form 8 for photo correction. Bring a new recent passport-size photograph. The updated card is issued after verification."
       },
       "double_entry": {
         "problem": "I'm registered in two different constituencies",
-        "solution": "File Form 7 to delete one entry. By law, you can only be registered in one constituency."
+        "solution": "File Form 7 to delete one entry. By law, you can only be registered in one constituency — your current residential address."
       },
       "wrong_address": {
         "problem": "Voter ID shows my old address after moving",
-        "solution": "If within the same constituency, use Form 8A (transposition — fastest option)."
+        "solution": "If within the same constituency, use Form 8A (transposition — fastest option). If you've moved to a new constituency, file Form 7 + Form 6."
       },
       "damaged_epic": {
         "problem": "My Voter ID card is damaged or torn",
-        "solution": "Apply for a duplicate EPIC at voters.eci.gov.in. Pay the Rs 25 fee."
+        "solution": "Apply for a duplicate EPIC at voters.eci.gov.in. Pay the Rs 25 fee. While waiting, the e-EPIC digital card on the Voter Helpline App is legally valid at booths."
       }
     }
   },
+  "facts": [
+    "India has the world's largest democracy with over 960 million registered voters as of 2024.",
+    "The first general election of independent India (1951–52) took nearly 4 months to complete across 489 constituencies.",
+    "Electronic Voting Machines (EVMs) were first used in India in the 1982 Kerala State Assembly by-election.",
+    "Indelible ink used on voters' fingers is made from silver nitrate and was introduced in the 1962 general elections.",
+    "India's Election Commission was established on January 25, 1950 — now celebrated as National Voters' Day every year.",
+    "NOTA (None Of The Above) was introduced in Indian elections following a landmark Supreme Court ruling in October 2013.",
+    "The Model Code of Conduct kicks in the moment election dates are announced — it has no legal force but carries immense political weight.",
+    "India's Lok Sabha has 543 elected seats; winning an outright majority requires at least 272 seats.",
+    "VVPAT (Voter Verified Paper Audit Trail) machines have been mandatory alongside EVMs since the 2019 general elections.",
+    "Around 12 lakh polling stations were set up across India for the 2024 Lok Sabha elections — the largest election exercise on Earth."
+  ],
   "metadata": {
     "title": "VoteGuide India — Your Complete Voter Information Assistant",
     "description": "Understand voter registration (Form 6), corrections (Form 8), and how to vote in India."
+  },
+  "manifesto": {
+    "caption": "AI-Powered Analysis",
+    "title": "Party Manifesto Comparator",
+    "description": "Select two parties and a topic to get a side-by-side AI comparison of their 2024 election promises.",
+    "party1Label": "Party 1",
+    "party2Label": "Party 2",
+    "topicLabel": "Topic",
+    "selectParty": "Select a party...",
+    "selectTopic": "Select a topic...",
+    "compareBtn": "Compare Manifestos",
+    "analyzing": "Analyzing manifestos...",
+    "keyPromises": "Key Promises",
+    "verdict": "AI Analysis",
+    "disclaimer": "AI-generated summary based on publicly available 2024 manifesto data. Always verify with official party sources.",
+    "error": "Failed to generate comparison. Please try again."
+  },
+  "mythbuster": {
+    "caption": "Fake News Fighter",
+    "title": "Election Myth-Buster",
+    "description": "Paste any viral claim or WhatsApp forward about Indian elections. Our AI checks it against official ECI rules and gives a verdict.",
+    "placeholder": "Paste a claim or WhatsApp message here... e.g. \"You can vote using your mobile phone\"",
+    "checkBtn": "Fact-Check This",
+    "checking": "Fact-checking...",
+    "tryExample": "Try an example:",
+    "explanation": "Explanation",
+    "officialSource": "Official Source",
+    "voterTip": "Voter Tip",
+    "checkAnother": "Check Another Claim",
+    "error": "Failed to fact-check. Please try again."
   }
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 // Global helper to trigger toasts from anywhere
 export const showToast = (message, type = 'info') => {
@@ -10,6 +11,7 @@ export const showToast = (message, type = 'info') => {
 };
 
 export default function Toast() {
+  const t = useTranslations('common');
   const [toasts, setToasts] = useState([]);
 
   useEffect(() => {
@@ -90,7 +92,7 @@ export default function Toast() {
               </span>
               <button
                 onClick={() => removeToast(toast.id)}
-                aria-label="Dismiss notification"
+                aria-label={t('dismiss')}
                 style={{
                   background: 'transparent',
                   border: 'none',

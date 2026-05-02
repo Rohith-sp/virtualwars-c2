@@ -15,12 +15,24 @@ export default getRequestConfig(async (params) => {
   const enMessages = (await import(`./messages/en.json`)).default;
   
   function deepMerge(target, source) {
-    for (const key in source) {
-      if (source[key] instanceof Object && key in target) {
-        Object.assign(source[key], deepMerge(target[key], source[key]));
-      }
+    const isObject = (obj) => obj && typeof obj === 'object' && !Array.isArray(obj);
+    let result = { ...target };
+    if (isObject(target) && isObject(source)) {
+      Object.keys(source).forEach(key => {
+        if (isObject(source[key])) {
+          if (!(key in target)) {
+            result[key] = source[key];
+          } else {
+            result[key] = deepMerge(target[key], source[key]);
+          }
+        } else {
+          result[key] = source[key];
+        }
+      });
+    } else {
+      return source;
     }
-    return { ...target, ...source };
+    return result;
   }
 
   let messages = enMessages;

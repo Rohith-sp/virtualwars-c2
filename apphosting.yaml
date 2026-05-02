@@ -1,0 +1,22 @@
+# Firebase App Hosting backend configuration
+# See: https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  concurrency: 100
+  cpu: 1
+  memoryMiB: 512
+  minInstances: 0
+  maxInstances: 5
+
+env:
+  - variable: ALLOWED_ORIGIN
+    value: https://YOUR_PROJECT_ID.web.app   # ← Replace with your Firebase URL
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_GA_ID
+    value: G-XXXXXXXXXX                       # ← Replace with your GA4 ID (or delete this block)
+    availability:
+      - BUILD
+      - RUNTIME

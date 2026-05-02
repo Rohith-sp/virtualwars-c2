@@ -83,7 +83,7 @@ export default function EpicFormatter() {
             <button
               className="btn btn-ghost btn-sm"
               onClick={handleCopy}
-              aria-label="Copy EPIC number to clipboard"
+              aria-label={t('copyAria')}
               style={{ flexShrink: 0, padding: 'var(--space-2)' }}
             >
               {copied ? t('copied') : t('copy')}

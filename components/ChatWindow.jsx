@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { trackEvent, GA_EVENTS } from '@/lib/analytics';
 
@@ -17,6 +17,66 @@ function autoResize(el) {
   el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
 }
 
+function FormattedText({ text }) {
+  if (!text) return null;
+
+  const lines = text.split('\n');
+  const result = [];
+  let currentList = null;
+
+  lines.forEach((line, i) => {
+    const trimmed = line.trim();
+    const isBullet = trimmed.startsWith('- ') || trimmed.startsWith('• ') || (trimmed.match(/^\d+\.\s/) && trimmed.length > 2);
+
+    if (isBullet) {
+      if (!currentList) {
+        currentList = { type: trimmed.match(/^\d+\.\s/) ? 'ol' : 'ul', items: [] };
+        result.push(currentList);
+      }
+      currentList.items.push(parseBold(trimmed.replace(/^[-•]|\d+\.\s/, '').trim()));
+    } else {
+      currentList = null;
+      if (trimmed === '') {
+        result.push(<div key={`br-${i}`} style={{ height: 'var(--space-2)' }} />);
+      } else {
+        result.push(<p key={i} style={{ margin: 0 }}>{parseBold(line)}</p>);
+      }
+    }
+  });
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      {result.map((item, i) => {
+        if (item.type === 'ul') {
+          return (
+            <ul key={i} style={{ paddingLeft: 'var(--space-5)', margin: '4px 0', listStyle: 'disc' }}>
+              {item.items.map((text, li) => <li key={li}>{text}</li>)}
+            </ul>
+          );
+        }
+        if (item.type === 'ol') {
+          return (
+            <ol key={i} style={{ paddingLeft: 'var(--space-5)', margin: '4px 0', listStyle: 'decimal' }}>
+              {item.items.map((text, li) => <li key={li}>{text}</li>)}
+            </ol>
+          );
+        }
+        return <React.Fragment key={i}>{item}</React.Fragment>;
+      })}
+    </div>
+  );
+}
+
+function parseBold(text) {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} style={{ fontWeight: 700, color: 'inherit' }}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
 export default function ChatWindow({ onClose }) {
   const tChat = useTranslations('chat');
   const locale = useLocale();
@@ -30,7 +90,7 @@ export default function ChatWindow({ onClose }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: 'Hi! Ask me anything about voting in India — registration, lost ID, NOTA, or election day rules.',
+      text: tChat('welcome'),
     },
   ]);
   const [input, setInput] = useState('');
@@ -39,6 +99,111 @@ export default function ChatWindow({ onClose }) {
   const logRef = useRef(null);
   const textareaRef = useRef(null);
   const sessionId = useRef(`session-${Date.now()}`);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isMuted, setIsMuted] = useState(true); // Default to off as requested
+  const recognitionRef = useRef(null);
+
+  const stopSpeaking = useCallback(() => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  }, []);
+
+  const speakText = useCallback((text) => {
+    if (isMuted) return;
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Stop any ongoing speech
+      
+      const cleanText = text
+        .replace(/\*\*/g, '')
+        .replace(/^[•\-\*]\s+/gm, '')
+        .trim();
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      
+      const targetLang = {
+        en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN',
+        ta: 'ta-IN', mr: 'mr-IN', gu: 'gu-IN', kn: 'kn-IN', pa: 'pa-IN'
+      }[locale] || locale;
+
+      utterance.lang = targetLang;
+
+      // Find the best voice for the target language
+      const voices = window.speechSynthesis.getVoices();
+      
+      // Filter voices by language code (e.g., 'hi-IN' or 'hi')
+      const matchingVoices = voices.filter(v => 
+        v.lang.toLowerCase() === targetLang.toLowerCase() || 
+        v.lang.split('-')[0].toLowerCase() === targetLang.split('-')[0].toLowerCase()
+      );
+
+      if (matchingVoices.length > 0) {
+        // Prefer a local voice if available, otherwise just pick the first match
+        utterance.voice = matchingVoices.find(v => v.localService) || matchingVoices[0];
+      }
+      
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      setIsSpeaking(true);
+      window.speechSynthesis.speak(utterance);
+    }
+  }, [locale, isMuted]);
+
+  const toggleRecording = useCallback(() => {
+    if (!('webkitSpeechRecognition' in window) || !('SpeechRecognition' in window)) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+        return;
+      }
+    }
+
+    if (isRecording) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    
+    // Better locale mapping for recognition
+    const recognitionLocales = {
+      en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN',
+      ta: 'ta-IN', mr: 'mr-IN', gu: 'gu-IN', kn: 'kn-IN', pa: 'pa-IN'
+    };
+    recognition.lang = recognitionLocales[locale] || locale;
+    recognition.continuous = false;
+    recognition.interimResults = true; // Show results as they come
+
+    recognition.onstart = () => setIsRecording(true);
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map(result => result[0])
+        .map(result => result.transcript)
+        .join('');
+      
+      if (event.results[0].isFinal) {
+        setInput((prev) => prev + (prev ? ' ' : '') + transcript);
+      }
+    };
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error', event.error);
+      setIsRecording(false);
+    };
+    recognition.onend = () => setIsRecording(false);
+
+    try {
+      recognition.start();
+    } catch (e) {
+      console.error('Failed to start speech recognition', e);
+      setIsRecording(false);
+    }
+  }, [isRecording, locale]);
 
   useEffect(() => {
     if (logRef.current) {
@@ -65,8 +230,12 @@ export default function ChatWindow({ onClose }) {
 
   const handleClose = useCallback(() => {
     setError('');
+    stopSpeaking();
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (e) {}
+    }
     onClose();
-  }, [onClose]);
+  }, [onClose, stopSpeaking]);
 
   const handleSubmit = useCallback(
     async (e, predefinedQuestion = null) => {
@@ -100,11 +269,11 @@ export default function ChatWindow({ onClose }) {
         });
 
         if (res.status === 429) {
-          setError('Rate limit reached. Please wait a minute before asking again.');
+          setError(tChat('rateLimit'));
           return;
         }
         if (res.status === 504) {
-          setError('The AI is taking too long right now. Please try again in a moment.');
+          setError(tChat('timeout'));
           return;
         }
         if (!res.ok) {
@@ -115,12 +284,12 @@ export default function ChatWindow({ onClose }) {
         const data = await res.json();
         setMessages((prev) => [...prev, { role: 'assistant', text: data.answer }]);
       } catch {
-        setError('Network error. Please check your connection.');
+        setError(tChat('networkError'));
       } finally {
         setLoading(false);
       }
     },
-    [input, loading, messages, buildHistory],
+    [input, loading, messages, buildHistory, locale, tChat],
   );
 
   const handleKeyDown = useCallback(
@@ -147,6 +316,11 @@ export default function ChatWindow({ onClose }) {
           0%, 100% { transform: translateY(0); opacity: 0.4; }
           50% { transform: translateY(-4px); opacity: 1; }
         }
+        @keyframes pulse-red {
+          0% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.4); }
+          70% { box-shadow: 0 0 0 10px rgba(192, 57, 43, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0); }
+        }
         .chat-dot { animation: dot-bounce 1s ease-in-out infinite; }
         .chat-dot:nth-child(2) { animation-delay: 0.15s; }
         .chat-dot:nth-child(3) { animation-delay: 0.3s; }
@@ -155,6 +329,7 @@ export default function ChatWindow({ onClose }) {
         .chat-close-btn:hover { color: var(--text-primary) !important; }
         .chat-textarea::-webkit-scrollbar { width: 4px; }
         .chat-textarea::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+        .recording-pulse { animation: pulse-red 1.5s infinite; }
       `}</style>
 
       <div
@@ -196,27 +371,48 @@ export default function ChatWindow({ onClose }) {
             🗳️
           </div>
           <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9375rem' }}>
-            AI Election Assistant
+            {tChat('title')}
           </span>
-          <button
-            onClick={handleClose}
-            className="chat-close-btn"
-            style={{
-              marginLeft: 'auto',
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--text-muted)',
-              fontSize: '1.25rem',
-              cursor: 'pointer',
-              lineHeight: 1,
-              padding: '2px 4px',
-              borderRadius: 4,
-              transition: 'color 0.15s',
-            }}
-            aria-label="Close AI chat"
-          >
-            ✕
-          </button>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => setIsMuted(!isMuted)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                fontSize: '1.25rem',
+                cursor: 'pointer',
+                padding: '4px',
+                borderRadius: 4,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'color 0.15s',
+              }}
+              aria-label={isMuted ? "Unmute voice output" : "Mute voice output"}
+              title={isMuted ? "Unmute" : "Mute"}
+            >
+              {isMuted ? '🔇' : '🔊'}
+            </button>
+            <button
+              onClick={handleClose}
+              className="chat-close-btn"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                fontSize: '1.25rem',
+                cursor: 'pointer',
+                lineHeight: 1,
+                padding: '2px 4px',
+                borderRadius: 4,
+                transition: 'color 0.15s',
+              }}
+              aria-label="Close AI chat"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* ── Message log ── */}
@@ -283,7 +479,28 @@ export default function ChatWindow({ onClose }) {
                   boxShadow: msg.role === 'user' ? 'var(--shadow-sm)' : 'none',
                 }}
               >
-                {msg.text}
+                <FormattedText text={msg.text} />
+                {msg.role === 'assistant' && (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-2)' }}>
+                    <button
+                      onClick={() => isSpeaking ? stopSpeaking() : speakText(msg.text)}
+                      disabled={isMuted && !isSpeaking}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: isMuted && !isSpeaking ? 'var(--text-muted)' : 'var(--accent-blue)',
+                        cursor: isMuted && !isSpeaking ? 'not-allowed' : 'pointer',
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                      aria-label={isSpeaking ? "Stop reading" : "Read message aloud"}
+                    >
+                      {isSpeaking ? '⏹️ Stop' : '🔊 Listen'}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -422,6 +639,25 @@ export default function ChatWindow({ onClose }) {
               disabled={loading}
             />
             <button
+              type="button"
+              onClick={toggleRecording}
+              className={`btn ${isRecording ? 'btn-primary recording-pulse' : 'btn-outline'}`}
+              aria-label="Toggle voice input"
+              style={{
+                flexShrink: 0,
+                alignSelf: 'flex-end',
+                width: 44,
+                height: 44,
+                padding: 0,
+                borderRadius: 'var(--radius-md)',
+                borderColor: isRecording ? 'transparent' : 'var(--border)',
+                background: isRecording ? 'var(--accent-red)' : 'transparent',
+                color: isRecording ? 'white' : 'var(--text-primary)'
+              }}
+            >
+              🎤
+            </button>
+            <button
               type="submit"
               className="btn btn-primary chat-send-btn"
               disabled={!input.trim() || loading}
@@ -453,7 +689,7 @@ export default function ChatWindow({ onClose }) {
                 paddingRight: 2,
               }}
             >
-              {charsLeft} characters left
+              {tChat('charsLeft', { count: charsLeft })}
             </div>
           )}
         </form>

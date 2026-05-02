@@ -39,7 +39,7 @@ export default function ShareCard() {
     }
   };
 
-  const displayName = name.trim() || 'Your Name';
+  const displayName = name.trim() || t('defaultName');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-6)' }}>
@@ -128,9 +128,9 @@ export default function ShareCard() {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Enter your name (optional)"
+          placeholder={t('namePlaceholder')}
           maxLength={40}
-          aria-label="Your name for the voter card"
+          aria-label={t('nameAria')}
           style={{ textAlign: 'center' }}
         />
 
@@ -138,7 +138,7 @@ export default function ShareCard() {
           className="btn btn-primary share-download-btn"
           onClick={handleDownload}
           disabled={generating}
-          aria-label="Download your voter card as a PNG image"
+          aria-label={t('downloadAria')}
           style={{ justifyContent: 'center' }}
         >
           {generating ? tCommon('loading') : `⬇ ${t('download')}`}

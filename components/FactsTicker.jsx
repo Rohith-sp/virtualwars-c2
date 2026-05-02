@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import facts from '@/data/facts.json';
 
 const INTERVAL_MS = 6000;
 
 export default function FactsTicker() {
   const t = useTranslations('common');
+  const tFacts = useTranslations('');
+  const facts = tFacts.raw('facts');
   const indexRef = useRef(0);
   const fadeTimerRef = useRef(null);
   const [fact, setFact] = useState(facts[0]);
@@ -26,7 +27,7 @@ export default function FactsTicker() {
       clearInterval(timer);
       clearTimeout(fadeTimerRef.current);
     };
-  }, []);
+  }, [facts]);
 
   return (
     <div
