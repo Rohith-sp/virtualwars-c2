@@ -11,35 +11,39 @@ const GEMINI_TIMEOUT_MS = 8000;
 
 // ── CORS helpers ──────────────────────────────────────────────────────────────
 function getAllowedOrigins() {
-  const origins = (process.env.ALLOWED_ORIGINS ?? process.env.ALLOWED_ORIGIN ?? '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-  
-  // Default for local development
-  if (origins.length === 0) {
-    return ['http://localhost:3000', 'http://127.0.0.1:3000'];
-  }
-  return origins;
+  const env = (process.env.ALLOWED_ORIGINS ?? process.env.ALLOWED_ORIGIN ?? '').split(',').map(s => s.trim()).filter(Boolean);
+  return [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    // Vercel production + preview URLs
+    'https://vote-guide-india.vercel.app',
+    ...env,
+  ];
+}
+
+function isOriginAllowed(origin) {
+  if (!origin) return true; // same-origin requests have no Origin header
+  const allowed = getAllowedOrigins();
+  if (allowed.includes(origin)) return true;
+  // Allow any *.vercel.app preview deployment
+  if (origin.endsWith('.vercel.app')) return true;
+  return false;
 }
 
 function buildCorsHeaders(origin) {
-  return { 'Access-Control-Allow-Origin': origin };
+  return { 'Access-Control-Allow-Origin': origin || '*' };
 }
 
 // ── Preflight handler ─────────────────────────────────────────────────────────
 export async function OPTIONS(request) {
   const origin = request.headers.get('origin') ?? '';
-  const allowedOrigins = getAllowedOrigins();
-
-  if (origin && !allowedOrigins.includes(origin)) {
+  if (origin && !isOriginAllowed(origin)) {
     return new Response(null, { status: 403 });
   }
-
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Origin': origin || '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Max-Age': '86400',
@@ -50,7 +54,7 @@ export async function OPTIONS(request) {
 // ── Route handler ─────────────────────────────────────────────────────────────
 export async function POST(request) {
   // Keys are validated inside aiProvider — just check at least one exists
-  const hasAnyKey = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_2 || process.env.GROQ_API_KEY;
+  const hasAnyKey = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_2 || process.env.GROQ_API_KEY || process.env.GROQ_API_KEY_2;
   if (!hasAnyKey) {
     console.error('[VoteGuide] No AI provider keys configured');
     return Response.json({ error: 'AI service not configured.' }, { status: 500 });
@@ -58,9 +62,7 @@ export async function POST(request) {
 
   // ── CORS check ────────────────────────────────────────────────────────────
   const origin = request.headers.get('origin') ?? '';
-  const allowedOrigins = getAllowedOrigins();
-  // Same-origin requests have no Origin header — always allow.
-  if (origin && !allowedOrigins.includes(origin)) {
+  if (origin && !isOriginAllowed(origin)) {
     return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
   const corsHeaders = origin ? buildCorsHeaders(origin) : {};
