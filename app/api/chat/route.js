@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/nextjs';
 import { ratelimit } from '@/lib/rateLimiter';
 import { generateChat } from '@/lib/aiProvider';
 
@@ -143,7 +142,6 @@ Answer ONLY questions about voter registration, EPIC cards, Forms 6/7/8/8A, voti
       );
     }
     console.error('AI error:', error.message);
-    Sentry.captureException(error, { extra: { question } });
     return Response.json(
       { error: 'AI service error. Please try again.' },
       { status: 502, headers: corsHeaders },

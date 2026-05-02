@@ -12,7 +12,6 @@
 # next.js
 /.next/
 /out/
-/out2.html
 
 # production
 /build
@@ -37,12 +36,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# firebase
+# firebase (removed — using Vercel now)
 .firebase/
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
 .firebaserc
+firebase.json
+apphosting.yaml
 
 # deployment docs — kept local only
 DEPLOY.md
