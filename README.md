@@ -3,7 +3,7 @@
 > An intelligent, multilingual voter education platform built for India's 96 crore+ registered voters. From voter registration to real-time manifesto analysis, VoteGuide India makes democracy accessible.
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
-[![Firebase](https://img.shields.io/badge/Firebase-App_Hosting-orange?logo=firebase)](https://firebase.google.com)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)](https://vercel.com)
 [![Gemini](https://img.shields.io/badge/Gemini-Flash-blue?logo=google)](https://ai.google.dev)
 [![Groq](https://img.shields.io/badge/Groq-LLaMA_3.3-green)](https://groq.com)
 [![i18n](https://img.shields.io/badge/Languages-9-purple)](https://next-intl-docs.vercel.app)
@@ -130,10 +130,11 @@ The platform was built as a hackathon project demonstrating how AI can democrati
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Infrastructure                               │
 │                                                                 │
-│  Firebase App Hosting (Production)                              │
-│  ├── Automatic HTTPS + CDN                                      │
-│  ├── Secret Manager for API keys                                │
-│  └── apphosting.yaml configuration                              │
+│  Vercel (Production)                                            │
+│  ├── Automatic HTTPS + Global Edge CDN                          │
+│  ├── Environment Variables for API keys (dashboard)             │
+│  ├── Mumbai region (bom1) — closest to India                    │
+│  └── Auto-deploy on every git push to main                      │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -190,8 +191,8 @@ All components call useTranslations() hook
 | **Monitoring** | Sentry | Error tracking |
 | **Analytics** | Google Analytics 4 | Usage metrics |
 | **Rate Limiting** | Upstash Redis (optional) | API abuse prevention |
-| **Deployment** | Firebase App Hosting | Production hosting |
-| **CI/CD** | GitHub → Firebase | Auto-deploy on push |
+| **Deployment** | Vercel | Production hosting |
+| **CI/CD** | GitHub → Vercel | Auto-deploy on push |
 
 ---
 
@@ -351,12 +352,18 @@ The app auto-redirects to your browser's preferred language on first load.
 
 ## Deployment
 
-See **`DEPLOY.md`** (local file, not in git) for step-by-step Firebase App Hosting deployment instructions including Secret Manager setup for production API keys.
+Deployed on **Vercel** — zero config for Next.js, free tier, auto-deploys on every push.
 
-Quick deploy after setup:
-```bash
-firebase deploy
-```
+### Deploy your own:
+1. Go to [vercel.com](https://vercel.com) → Sign up with GitHub
+2. Import `Rohith-sp/virtualwars-c2`
+3. Add environment variables in Vercel dashboard:
+   - `GEMINI_API_KEY` — [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+   - `GEMINI_API_KEY_2` — (optional backup key)
+   - `GROQ_API_KEY` — [console.groq.com/keys](https://console.groq.com/keys)
+4. Click **Deploy** → live in ~2 minutes ✅
+
+See `DEPLOY.md` (local only, not in git) for detailed instructions.
 
 ---
 
