@@ -152,47 +152,39 @@ export default function ChatWindow({ onClose }) {
   }, [locale, isMuted]);
 
   const toggleRecording = useCallback(() => {
-    if (!('webkitSpeechRecognition' in window) || !('SpeechRecognition' in window)) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
-        return;
-      }
-    }
-
-    if (isRecording) {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Voice input requires Chrome or Edge browser.');
       return;
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
     const recognition = new SpeechRecognition();
     recognitionRef.current = recognition;
-    
-    // Better locale mapping for recognition
+
     const recognitionLocales = {
       en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN',
       ta: 'ta-IN', mr: 'mr-IN', gu: 'gu-IN', kn: 'kn-IN', pa: 'pa-IN'
     };
     recognition.lang = recognitionLocales[locale] || locale;
     recognition.continuous = false;
-    recognition.interimResults = true; // Show results as they come
+    recognition.interimResults = true;
 
     recognition.onstart = () => setIsRecording(true);
     recognition.onresult = (event) => {
       const transcript = Array.from(event.results)
-        .map(result => result[0])
-        .map(result => result.transcript)
+        .map(r => r[0].transcript)
         .join('');
-      
-      if (event.results[0].isFinal) {
-        setInput((prev) => prev + (prev ? ' ' : '') + transcript);
+      if (event.results[event.results.length - 1].isFinal) {
+        setInput(prev => prev ? `${prev} ${transcript}` : transcript);
       }
     };
     recognition.onerror = (event) => {
-      console.error('Speech recognition error', event.error);
+      console.warn('Speech recognition error:', event.error);
       setIsRecording(false);
     };
     recognition.onend = () => setIsRecording(false);
@@ -200,7 +192,7 @@ export default function ChatWindow({ onClose }) {
     try {
       recognition.start();
     } catch (e) {
-      console.error('Failed to start speech recognition', e);
+      console.error('Failed to start speech recognition:', e);
       setIsRecording(false);
     }
   }, [isRecording, locale]);
