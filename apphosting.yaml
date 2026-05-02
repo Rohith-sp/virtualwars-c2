@@ -10,13 +10,16 @@ runConfig:
 
 env:
   - variable: ALLOWED_ORIGIN
-    value: https://YOUR_PROJECT_ID.web.app   # ← Replace with your Firebase URL
+    value: https://voteguide-india-320d6.web.app
     availability:
       - BUILD
       - RUNTIME
 
-  - variable: NEXT_PUBLIC_GA_ID
-    value: G-XXXXXXXXXX                       # ← Replace with your GA4 ID (or delete this block)
-    availability:
-      - BUILD
-      - RUNTIME
+  - variable: GEMINI_API_KEY
+    secret: GEMINI_API_KEY
+
+  - variable: GEMINI_API_KEY_2
+    secret: GEMINI_API_KEY_2
+
+  - variable: GROQ_API_KEY
+    secret: GROQ_API_KEY
